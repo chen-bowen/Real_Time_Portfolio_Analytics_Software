@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Portfolio Optimization</title>
+</head>
+<body>
+
+<form method="post" action="/portfolio/save_data">
+    <input type="submit" value="Save Data"/>
+    <label> - Saving Data for 10 Assets specified in app.py</label>
+</form>
+
+
+<form method="get" action="/portfolio/get_optimal_portfolio">
+    <h3>Run Mean-Variance Optimization</h3>
+    <label>Risk Limit (%):</label>
+    <input id="risk_limit" name="risk_limit" type="text"/>
+    <input type="submit" value="Optimize"/>
+    <br>
+    <label>Optimal Portfolio:</label>
+    {{data | safe }}
+</form>
+</body>
+</html>
