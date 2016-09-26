@@ -5,7 +5,9 @@ from common.utils import get_return_data, mvoptimization
 import pandas as pd
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:test123@localhost/capstone'
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://username:password@hostname/database_name'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:12345@localhost/capstone'
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 
 # app.debug = True
