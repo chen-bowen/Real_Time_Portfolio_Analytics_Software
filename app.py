@@ -84,4 +84,5 @@ def save_data():
 
 if __name__ == "__main__":
     db.create_all()
+    print "testing"
     app.run(debug=True)
