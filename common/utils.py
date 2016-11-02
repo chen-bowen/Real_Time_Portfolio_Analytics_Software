@@ -109,4 +109,5 @@ if __name__ == "__main__":
     Q2 = 0.03
     Q = np.array([Q1, Q2])
 
-    result = Black_Litterman(result, alpha, P, Q, wmkt)
+    result = Black_Litterman(result['df_return'], alpha, P, Q, wmkt)
+    print result
