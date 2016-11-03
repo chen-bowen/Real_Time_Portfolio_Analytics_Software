@@ -1,46 +1,22 @@
+
+
 import numpy as np
 from scipy import linalg
-import datetime
-import pandas as pd
-from pandas_datareader import data
-#import cvxpy
+from utils import get_return_data
 
-def get_return_data(asset_list,
-                    price_type='Open',
-                    source='google',
-                    start_date='1990-01-01',
-                    end_date=datetime.datetime.today()):
-
-
-    start_date = pd.to_datetime(start_date)
-    end_date = pd.to_datetime(end_date)
-    date_range = pd.bdate_range(start_date, end_date)
-    try:
-        df_price = pd.DataFrame(index=date_range, columns=asset_list)
-        for ls in asset_list:
-            try:
-                price_data = data.DataReader(ls, source, start_date, end_date)[price_type]
-                price_data.rename(ls, inplace=True)
-                df_price[ls] = price_data.T
-            except Exception as dr:
-                pass
-        df_price.dropna(inplace=True)
-        df_return = df_price.pct_change()
-    except Exception as e:
-        raise RuntimeError(e)
-
-    return {'df_price': df_price,
-            'df_return': df_return}
-            
 def Black_Litterman(return_data, alpha, P, Q, wmkt):
+    # set tau scalar
     tau = 0.05
-#    std = return_data.std().as_matrix()
+    # find the covariance matrix according to the return data
     sigma = return_data.cov().as_matrix()
+    # pre-calculate the product fo tau and sigma
     scaled_sigma = tau*sigma
+    # pre-calculate [tau*sigma]^-1
     scaled_sigma_inv = linalg.inv(scaled_sigma)
-    
+
+    # The implied return of the asset, calculated from CAPM asset pricing model
     pi = (alpha*sigma).dot(wmkt)
-    
+
     Omega = (P.dot(scaled_sigma).dot(P.T)) * np.eye(Q.shape[0])
     Omega_inv= linalg.inv(Omega)
     
@@ -58,7 +34,7 @@ if __name__ == "__main__":
     wmkt = np.array([0.615,0.0783,0.1827,0.124])
     
     alpha = 2.5
-    P1 = np.array([0,  -.295, 1.00, -.705])
+    P1 = np.array([0,  0, 1.00, -1.0])
     P2 = np.array([0, 1.0, 0, -1.0 ])
     P = np.array([P1,P2])
     
@@ -67,7 +43,7 @@ if __name__ == "__main__":
     Q=np.array([Q1,Q2])
     
     result =  Black_Litterman(return_data, alpha, P, Q, wmkt)
-    
+    print result
     
     '''
     expected_return = result['df_return'].mean().as_matrix()
@@ -133,3 +109,5 @@ if __name__ == "__main__":
     print w.value
     
     '''
+
+
