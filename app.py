@@ -1,7 +1,9 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask import request, redirect, url_for, render_template
-from common.utils import get_return_data, mvoptimization
+from common.Return_Data_Collector import get_return_data
+from common.MVO_Transaction_Costs import mvoptimization
+from common.Black_Litterman import Black_Litterman
 import pandas as pd
 
 app = Flask(__name__)
