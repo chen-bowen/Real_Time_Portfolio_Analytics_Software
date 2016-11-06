@@ -1,11 +1,10 @@
 import pandas as pd
-import numpy as np
 import datetime
 from pandas_datareader import data
-import cvxpy
-from scipy import linalg
+import datapackage
 
-def get_return_data(asset_list,
+
+def get_asset_return_data(asset_list,
                     price_type='Open',
                     source='yahoo',
                     start_date='1990-01-01',
@@ -32,48 +31,35 @@ def get_return_data(asset_list,
     return {'df_price': df_price,
             'df_return': df_return}
 
-def mvoptimization(df_return, risk_limit, wealth=1):
-    # expected return found by calculating the mean of each stock (sample mean)
-    expected_return = df_return.mean()
-    # covariance found by caluculating the covariance across different samples
-    covariance = df_return.cov()
-    num_assets = len(covariance)
-    name_asset = covariance.columns
+def get_SP500():
+    dp = datapackage.DataPackage('http://data.okfn.org/data/core/s-and-p-500-companies/datapackage.json')
+    SP500 = pd.DataFrame(dp.resources[1].data)
+    SP500 = SP500[['Symbol','Name','Sector','Price',	'Dividend Yield','Price/Earnings','Earnings/Share',
+                   'Book Value',	'52 week low',	'52 week high','Market Cap',	'EBITDA','Price/Sales',	'Price/Book',	'SEC Filings']]
 
-    # Initialize the weight variable that we are trying to find
-    w = cvxpy.Variable(num_assets)
-    # Input the return we get from the sample mean
-    Return = np.matrix(expected_return.values)
-    # Q as the covariance matrix
-    Q = np.matrix(covariance.values)
-    # Call the quadratic equation risk
-    risk = cvxpy.quad_form(w, Q)
+    return SP500
 
-    # List of constraints
-    constraints = list()
-    # Budget Constraint
-    constraints.append(cvxpy.sum_entries(w) == 1)
-    # Risk Constraint
-    constraints.append(risk <= risk_limit)
-    # Long only Constraint, could be turned off
-    constraints.append(w >= 0)
-    # Objective Function
-    objective = cvxpy.Maximize(Return*w)
+def get_market_portfolio(SP500):
+    #Find the market portfolio constituents from S&P 500
 
-    # Setting up the problem
-    prob = cvxpy.Problem(objective, constraints)
-    prob.solve(solver='CVXOPT', verbose=True)
+    SP500_sectorspecific = SP500.groupby('Sector')
+    Sectors = SP500_sectorspecific['Sector'].unique()
+    Portfolio = []
 
-    print("Risk of: {0}".format(np.sqrt(risk.value)))
-    weights = pd.DataFrame(w.value, index=name_asset, columns=['Holding'])
+    for sector in Sectors:
+        Selected_stock = SP500_sectorspecific.get_group(sector[0]).sort_values(by =['Earnings/Share'], ascending=[0]).head(4)
+        Portfolio.append(Selected_stock)
 
-    return np.round(weights, decimals=2) # Round to two significant digits
+    Portfolio = pd.concat(Portfolio)
 
-
+    return Portfolio
 
 if __name__ == "__main__":
     result = get_return_data(['GOOG', 'AMZN', 'AAPL', 'TVIX'])
-    print result['df_price'].tail(10)
-    optimal_weights = mvoptimization(result['df_return'], 0.05)
-    print optimal_weights
+    SP500 = get_SP500()
+    print SP500.head(5)
+    market_portfolio = get_market_portfolio(SP500)
+    print market_portfolio.head(5)
+
+
  #   result['df_return'].to_csv('URL')

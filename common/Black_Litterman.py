@@ -2,7 +2,7 @@
 
 import numpy as np
 from scipy import linalg
-from Return_Data_Collector import get_return_data
+from Return_Data_Collector import get_return_data,get_SP500, get_market_portfolio
 import cvxpy
 
 
