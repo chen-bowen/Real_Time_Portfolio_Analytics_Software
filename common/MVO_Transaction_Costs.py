@@ -1,5 +1,5 @@
 import numpy as np
-from Return_Data_Collector import get_return_data
+from Return_Data_Collector import get_asset_return_data,get_SP500, get_market_portfolio_weights
 import cvxpy
 import pandas as pd
 
@@ -41,7 +41,10 @@ def mvoptimization(df_return, risk_limit, wealth=1):
     return np.round(weights, decimals=2) # Round to two significant digits
 
 if __name__ == "__main__":
-    result = get_return_data(['GOOG', 'AMZN', 'AAPL', 'TVIX'])
-    print result['df_price'].tail(10)
+    SP500 = get_SP500()
+    market_portflio_weights = get_market_portfolio_weights(SP500,3)
+    #list_assets = list(["GOOG", "AAPL", "AMZN", "FB", "TSLA", "UWTI", "NFLX", "TVIX"] )
+    list_assets = list(market_portflio_weights['Symbol'])
+    result = get_asset_return_data(list_assets)
     optimal_weights = mvoptimization(result['df_return'], 0.05)
     print optimal_weights

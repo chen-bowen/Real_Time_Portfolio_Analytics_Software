@@ -2,7 +2,7 @@
 
 import numpy as np
 from scipy import linalg
-from Return_Data_Collector import get_return_data,get_SP500, get_market_portfolio
+from Return_Data_Collector import get_asset_return_data,get_SP500, get_market_portfolio_weights
 import cvxpy
 
 
@@ -56,9 +56,12 @@ def Black_Litterman(return_data, alpha, P, Q, wmkt):
 
 '''
 if __name__ == "__main__":
-    return_data = get_return_data(['GOOG', 'AMZN', 'AAPL', 'TVIX'])['df_return']
 
-    wmkt = np.array([0.615,0.0783,0.1827,0.124])
+    SP500 = get_SP500()
+    market_portfolio_weights = get_market_portfolio_weights(SP500,3)
+    list_assets = list(market_portfolio_weights['Symbol'])
+    return_data = get_asset_return_data(list_assets)['df_return']
+    market_weights = np.array(market_portfolio_weights['market portfolio weights'])
 
     alpha = 2.5
     P1 = np.array([0,  0, 1.00, -1.0])
@@ -69,7 +72,7 @@ if __name__ == "__main__":
     Q2 = 0.03
     Q=np.array([Q1,Q2])
 
-    result =  Black_Litterman(return_data, alpha, P, Q, wmkt)
+    result =  Black_Litterman(return_data, alpha, P, Q, market_weights)
     print result
 
     # right now most of the parameters are hard coded

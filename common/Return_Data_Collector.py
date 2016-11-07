@@ -39,27 +39,34 @@ def get_SP500():
 
     return SP500
 
-def get_market_portfolio(SP500):
-    #Find the market portfolio constituents from S&P 500
+def get_market_portfolio_weights(SP500,assets_per_sector):
+    #Find the market portfolio constituents and it weights from S&P 500
 
+
+    SP500 = SP500.drop(list(SP500[SP500['Market Cap'].isnull()].index.values))
     SP500_sectorspecific = SP500.groupby('Sector')
     Sectors = SP500_sectorspecific['Sector'].unique()
+
     Portfolio = []
 
     for sector in Sectors:
-        Selected_stock = SP500_sectorspecific.get_group(sector[0]).sort_values(by =['Earnings/Share'], ascending=[0]).head(4)
+        Selected_stock = SP500_sectorspecific.get_group(sector[0]).sort_values(by =['Earnings/Share'], ascending=[0]).head(assets_per_sector)
         Portfolio.append(Selected_stock)
 
     Portfolio = pd.concat(Portfolio)
+    total_market_cap = Portfolio['Market Cap'].sum()
+    Portfolio['market portfolio weights'] = Portfolio['Market Cap'] / total_market_cap
 
-    return Portfolio
+    portflio_weights = Portfolio[['Symbol', 'market portfolio weights']]
+
+    return portflio_weights
 
 if __name__ == "__main__":
-    result = get_return_data(['GOOG', 'AMZN', 'AAPL', 'TVIX'])
     SP500 = get_SP500()
-    print SP500.head(5)
-    market_portfolio = get_market_portfolio(SP500)
-    print market_portfolio.head(5)
+    market_portflio_weights = get_market_portfolio_weights(SP500,3)
+    list_assets = list(market_portflio_weights['Symbol'])
+    result = get_asset_return_data(list_assets)
+    print result.head(2)
 
 
  #   result['df_return'].to_csv('URL')
