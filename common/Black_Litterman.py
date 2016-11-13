@@ -4,7 +4,26 @@ import numpy as np
 from scipy import linalg
 from Return_Data_Collector import get_asset_return_data,get_SP500, get_market_portfolio_weights
 import cvxpy
+import pandas as pd
 
+def update_views(list_assets, num_views, relevant_assets, P_views_values, Q_views_values):
+    P = np.zeros((num_views,len(list_assets)))
+    # Update the pick matrix P
+    P_views_index = []
+    for i in range(num_views):
+        view_i_index = []
+        for j in relevant_assets[i]:
+            view_i_index.append(list_assets.index(j))
+        P_views_index.append(view_i_index)
+
+    for i in range(num_views):
+        for j in range(len(P_views_index[i])):
+            index = P_views_index[i][j]
+            P[i,index] = P_views_values[i][j]
+    # update views matrix Q
+    Q = np.array([Q_views_values[i] for i in range(len(Q_views_values))]).reshape(num_views, 1)
+
+    return [P,Q]
 
 def Black_Litterman(return_data, alpha, P, Q, wmkt):
     # P indicates which of the asset is relevant to the investor's view, right now it is hard coded
@@ -19,6 +38,7 @@ def Black_Litterman(return_data, alpha, P, Q, wmkt):
     # pre-calculate [tau*sigma]^-1
     scaled_sigma_inv = linalg.inv(scaled_sigma)
 
+    name_asset = return_data.columns
     # The implied return of the asset, calculated from CAPM asset pricing model
     pi = (alpha*sigma).dot(wmkt)
 
@@ -27,7 +47,7 @@ def Black_Litterman(return_data, alpha, P, Q, wmkt):
     Omega_inv= linalg.inv(Omega)
 
     # Find combined returns and combined covariance for the updated quadratic optimization
-    combined_return = linalg.inv(scaled_sigma_inv + P.T.dot(Omega_inv).dot(P)).dot(np.dot(scaled_sigma_inv,pi) + np.dot(np.dot(P.T,Omega_inv),Q))
+    combined_return = linalg.inv(scaled_sigma_inv + P.T.dot(Omega_inv).dot(P)).dot(np.dot(scaled_sigma_inv,pi).reshape(len(sigma), 1) + np.dot(np.dot(P.T,Omega_inv),Q))
     combined_covariance = sigma + linalg.inv(scaled_sigma_inv + P.T.dot(Omega_inv).dot(P))
     #combined_cov_inv = linalg.inv(combined_covariance)
 
@@ -38,16 +58,18 @@ def Black_Litterman(return_data, alpha, P, Q, wmkt):
 
 
     constraints = []
+    constraints.append(w <= 1)
     constraints.append(cvxpy.sum_entries(w) == 1)
 
-    objective = cvxpy.Maximize(combined_return * w - 0.5 * alpha * cvxpy.quad_form(w, combined_covariance))
+
+    objective = cvxpy.Maximize(combined_return.T * w - 0.5 * alpha * cvxpy.quad_form(w, combined_covariance))
     # objective = cvxpy.Maximize(combined_return*w -0.5*alpha*(w.T*combined_covariance*w))
     problem = cvxpy.Problem(objective)
     problem.solve(solver='CVXOPT', verbose=True)
 
-    print w.value
-
-    return [w, combined_return]
+    Return = (combined_return.T * w - 0.5 * alpha * cvxpy.quad_form(w, combined_covariance)).value
+    weights = pd.DataFrame(w.value, index=name_asset, columns=['Holding'])
+    return [weights,Return]
 
 '''
     # Calculate the weights
@@ -62,19 +84,22 @@ if __name__ == "__main__":
     list_assets = list(market_portfolio_weights['Symbol'])
     return_data = get_asset_return_data(list_assets)['df_return']
     market_weights = np.array(market_portfolio_weights['market portfolio weights'])
-
+#    expected_return = return_data.mean()
+#    market_port_return = market_weights.dot(expected_return)
+    num_views = 2
+    P = np.zeros((num_views,len(list_assets)))
     alpha = 2.5
-    P1 = np.array([0,  0, 1.00, -1.0])
-    P2 = np.array([0, 1.0, 0, -1.0 ])
-    P = np.array([P1,P2])
 
-    Q1 = 0.05
-    Q2 = 0.03
-    Q=np.array([Q1,Q2])
-
+    num_views = 2
+    relevant_assets = [['AZO', 'GOOGL'],['IBM']]
+    P_views_values = [[-1,1],[1]]
+    Q_views_values = [0.02,0.05]
+    Views_Matrices = update_views(list_assets, num_views, relevant_assets, P_views_values, Q_views_values)
+    P = Views_Matrices[0]
+    Q = Views_Matrices[1]
     result =  Black_Litterman(return_data, alpha, P, Q, market_weights)
-    print result
-
+    print result[0]
+    print result[1]
     # right now most of the parameters are hard coded
 
 

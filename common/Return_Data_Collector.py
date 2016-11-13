@@ -2,12 +2,13 @@ import pandas as pd
 import datetime
 from pandas_datareader import data
 import datapackage
+from dateutil.relativedelta import relativedelta
 
 
 def get_asset_return_data(asset_list,
                     price_type='Open',
                     source='yahoo',
-                    start_date='1990-01-01',
+                    start_date= datetime.datetime.today()+ relativedelta(years=-3),
                     end_date=datetime.datetime.today()):
 
 
@@ -39,8 +40,9 @@ def get_SP500():
 
     return SP500
 
-def get_market_portfolio_weights(SP500,assets_per_sector):
-    #Find the market portfolio constituents and it weights from S&P 500
+
+def get_market_portfolio_weights(SP500, assets_per_sector):
+    # Find the market portfolio constituents and it weights from S&P 500
 
 
     SP500 = SP500.drop(list(SP500[SP500['Market Cap'].isnull()].index.values))
@@ -50,12 +52,13 @@ def get_market_portfolio_weights(SP500,assets_per_sector):
     Portfolio = []
 
     for sector in Sectors:
-        Selected_stock = SP500_sectorspecific.get_group(sector[0]).sort_values(by =['Earnings/Share'], ascending=[0]).head(assets_per_sector)
+        Selected_stock = SP500_sectorspecific.get_group(sector[0]).sort_values(by=['Earnings/Share'],
+                                                                               ascending=[0]).head(assets_per_sector)
         Portfolio.append(Selected_stock)
 
     Portfolio = pd.concat(Portfolio)
-    total_market_cap = Portfolio['Market Cap'].sum()
-    Portfolio['market portfolio weights'] = Portfolio['Market Cap'] / total_market_cap
+    total_market_cap = Portfolio['Market Cap'].apply(float).sum()
+    Portfolio['market portfolio weights'] = Portfolio['Market Cap'].apply(float) / total_market_cap
 
     portflio_weights = Portfolio[['Symbol', 'market portfolio weights']]
 
