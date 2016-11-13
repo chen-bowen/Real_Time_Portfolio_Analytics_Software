@@ -1,0 +1,5 @@
+.nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
+
+div {
+  border: 2px solid darkblue;
+}
