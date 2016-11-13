@@ -54,17 +54,17 @@ def Black_Litterman(return_data, alpha, P, Q, wmkt):
     # For some reason this doesn't work
 
     num_asset = len(sigma)
-    w = cvxpy.Variable(num_asset)
+    w = cvxpy.Variable(num_asset) #30 assets
 
 
     constraints = []
-    constraints.append(w <= 1)
+    constraints.append(cvxpy.abs(w) <= 0.4)
     constraints.append(cvxpy.sum_entries(w) == 1)
 
 
     objective = cvxpy.Maximize(combined_return.T * w - 0.5 * alpha * cvxpy.quad_form(w, combined_covariance))
     # objective = cvxpy.Maximize(combined_return*w -0.5*alpha*(w.T*combined_covariance*w))
-    problem = cvxpy.Problem(objective)
+    problem = cvxpy.Problem(objective, constraints)
     problem.solve(solver='CVXOPT', verbose=True)
 
     Return = (combined_return.T * w - 0.5 * alpha * cvxpy.quad_form(w, combined_covariance)).value
@@ -93,14 +93,13 @@ if __name__ == "__main__":
     num_views = 2
     relevant_assets = [['AZO', 'GOOGL'],['IBM']]
     P_views_values = [[-1,1],[1]]
-    Q_views_values = [0.02,0.05]
+    Q_views_values = [0.1,0.03]
     Views_Matrices = update_views(list_assets, num_views, relevant_assets, P_views_values, Q_views_values)
     P = Views_Matrices[0]
     Q = Views_Matrices[1]
     result =  Black_Litterman(return_data, alpha, P, Q, market_weights)
     print result[0]
-    print result[1]
-    # right now most of the parameters are hard coded
+    print"Return of ",result[1]*100, "%"
 
 
 
