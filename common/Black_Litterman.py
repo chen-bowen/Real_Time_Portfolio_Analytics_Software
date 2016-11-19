@@ -58,7 +58,8 @@ def Black_Litterman(return_data, alpha, P, Q, wmkt):
 
 
     constraints = []
-    constraints.append(cvxpy.abs(w) <= 0.4)
+    #constraints.append(cvxpy.abs(w) <= 0.4)
+    constraints.append(w >= 0)
     constraints.append(cvxpy.sum_entries(w) == 1)
 
 

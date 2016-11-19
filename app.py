@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask import request, redirect, url_for, render_template
 from common.Return_Data_Collector import get_asset_return_data, get_SP500, get_market_portfolio_weights
 from common.MVO_Transaction_Costs import mvoptimization
-from common.Black_Litterman import Black_Litterman
+from common.Black_Litterman import Black_Litterman,update_views
 import pandas as pd
 
 app = Flask(__name__)
