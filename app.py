@@ -28,7 +28,6 @@ class User(db.Model):
     def __repr__(self):
         return '<User %r>' % self.username
 
-
 """
 Routes
 """
@@ -46,7 +45,6 @@ def user():
 @app.route('/portfolio')
 def portfolio():
     return render_template('portfolio.html')
-
 
 @app.route('/user/post_user', methods=['POST'])
 def post_user():
