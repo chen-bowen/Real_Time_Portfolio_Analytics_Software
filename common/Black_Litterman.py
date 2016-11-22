@@ -44,7 +44,10 @@ def Black_Litterman(return_data, alpha, P, Q, wmkt):
 
         # The standard error in investor's views
         Omega = (P.dot(scaled_sigma).dot(P.T)) * np.eye(Q.shape[0])
-        Omega_inv= linalg.inv(Omega)
+        try:
+            Omega_inv = linalg.inv(Omega)
+        except:
+            Omega_inv = Omega
 
         # Find combined returns and combined covariance for the updated quadratic optimization
         combined_return = linalg.inv(scaled_sigma_inv + P.T.dot(Omega_inv).dot(P)).dot(np.dot(scaled_sigma_inv,pi).reshape(len(sigma), 1) + np.dot(np.dot(P.T,Omega_inv),Q))
@@ -91,8 +94,8 @@ if __name__ == "__main__":
 
     num_views = 2
     relevant_assets = [['AZO', 'GOOGL'],['IBM']]
-    P_views_values = [[-1,1],[1]]
-    Q_views_values = [0.1,0.03]
+    P_views_values = [[0,0],[0]]
+    Q_views_values = [0,0]
     Views_Matrices = update_views(list_assets, num_views, relevant_assets, P_views_values, Q_views_values)
     P = Views_Matrices[0]
     Q = Views_Matrices[1]

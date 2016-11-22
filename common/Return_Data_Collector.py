@@ -6,17 +6,16 @@ from dateutil.relativedelta import relativedelta
 
 
 def get_asset_return_data(asset_list,
-                    price_type='Open',
-                    source='yahoo',
-                    start_date= datetime.datetime.today()+ relativedelta(years=-3),
-                    end_date=datetime.datetime.today()):
-
-
+                          price_type='Open',
+                          source='yahoo',
+                          start_date='2010-01-01',
+                          end_date=datetime.datetime.today()):
     start_date = pd.to_datetime(start_date)
     end_date = pd.to_datetime(end_date)
     date_range = pd.bdate_range(start_date, end_date)
     try:
         df_price = pd.DataFrame(index=date_range, columns=asset_list)
+
         for ls in asset_list:
             try:
                 price_data = data.DataReader(ls, source, start_date, end_date)[price_type]
@@ -24,19 +23,24 @@ def get_asset_return_data(asset_list,
                 df_price[ls] = price_data.T
             except Exception as dr:
                 pass
+        # df_price = df_price.drop('NEE', 1)
         df_price.dropna(inplace=True)
-        df_return = df_price.pct_change()
+        df_return = df_price.resample('M').apply(lambda x: x[-1]).pct_change()
     except Exception as e:
         raise RuntimeError(e)
 
     return {'df_price': df_price,
             'df_return': df_return}
 
+
 def get_SP500():
     dp = datapackage.DataPackage('http://data.okfn.org/data/core/s-and-p-500-companies/datapackage.json')
     SP500 = pd.DataFrame(dp.resources[1].data)
-    SP500 = SP500[['Symbol','Name','Sector','Price',	'Dividend Yield','Price/Earnings','Earnings/Share',
-                   'Book Value',	'52 week low',	'52 week high','Market Cap',	'EBITDA','Price/Sales',	'Price/Book',	'SEC Filings']]
+    SP500 = SP500[['Symbol', 'Name', 'Sector', 'Price', 'Dividend Yield', 'Price/Earnings', 'Earnings/Share',
+                   'Book Value', '52 week low', '52 week high', 'Market Cap', 'EBITDA', 'Price/Sales', 'Price/Book',
+                   'SEC Filings']]
+    SP500 = SP500[SP500['Symbol'] <> 'NEE']
+    SP500 = SP500[SP500['Symbol'] <> 'PSX']
 
     return SP500
 
@@ -46,6 +50,7 @@ def get_market_portfolio_weights(SP500, assets_per_sector):
 
 
     SP500 = SP500.drop(list(SP500[SP500['Market Cap'].isnull()].index.values))
+
     SP500_sectorspecific = SP500.groupby('Sector')
     Sectors = SP500_sectorspecific['Sector'].unique()
 
@@ -64,12 +69,15 @@ def get_market_portfolio_weights(SP500, assets_per_sector):
 
     return portflio_weights
 
+
 if __name__ == "__main__":
     SP500 = get_SP500()
-    market_portflio_weights = get_market_portfolio_weights(SP500,3)
+    market_portflio_weights = get_market_portfolio_weights(SP500,4)
     list_assets = list(market_portflio_weights['Symbol'])
-    result = get_asset_return_data(list_assets)
+
+    result = get_asset_return_data(list_assets)['df_return']
     print result.head(2)
+
 
 
  #   result['df_return'].to_csv('URL')
