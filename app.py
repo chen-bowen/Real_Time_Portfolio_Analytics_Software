@@ -2,9 +2,9 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask import request, redirect, url_for, render_template
 from common.Return_Data_Collector import get_asset_return_data, get_SP500, get_market_portfolio_weights
-from common.MVO_Transaction_Costs import mvoptimization
 from common.Black_Litterman import Black_Litterman,update_views
 import pandas as pd
+import numpy as np
 
 app = Flask(__name__)
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://username:password@hostname/database_name'
@@ -30,7 +30,6 @@ class User(db.Model):
     def __repr__(self):
         return '<User %r>' % self.username
 
-
 """
 Routes
 """
@@ -49,6 +48,9 @@ def user():
 def portfolio():
     return render_template('portfolio.html')
 
+@app.route('/customportfolio')
+def customportfolio():
+    return render_template('customportfolio.html')
 
 @app.route('/user/post_user', methods=['POST'])
 def post_user():
@@ -67,18 +69,54 @@ def delete_user():
     return redirect(url_for('user'))
 
 
-@app.route('/portfolio/get_optimal_portfolio_mvo', methods=['GET'])
-def get_optimal_portfolio_MVO():
-    df_return = pd.read_sql_table("returns", db.get_engine(app))
-
-    # request.args for GET methods
-    weights = mvoptimization(df_return, float(request.args['risk_limit'])/100)
-    return render_template('portfolio.html', name="Optimal Portfolio", data=weights.to_html())
-''''
 @app.route('/portfolio/get_optimal_portfolio_black_litterman', methods=['GET'])
 def get_optimal_portfolio_black_litterman():
-   df_return = pd.read_sql_table("returns", db.get_engine(app))
-'''
+
+    SP500 = get_SP500()
+    market_portfolio_weights = get_market_portfolio_weights(SP500, 3)
+    list_assets = list(market_portfolio_weights['Symbol'])
+    return_data = get_asset_return_data(list_assets)['df_return']
+    market_weights = np.array(market_portfolio_weights['market portfolio weights'])
+    num_views = 2
+    P = np.zeros((num_views, len(list_assets)))
+    alpha = 2.5
+
+    num_views = 2
+    relevant_assets = [['AZO', 'GOOGL'], ['IBM']]
+    P_views_values = [[0, 0], [0]]
+    Q_views_values = [0, 0]
+    Views_Matrices = update_views(list_assets, num_views, relevant_assets, P_views_values, Q_views_values)
+    P = Views_Matrices[0]
+    Q = Views_Matrices[1]
+    weights,Return = Black_Litterman(return_data, alpha, P, Q, market_weights)
+    print weights
+    return render_template('portfolio.html', name="Optimal Portfolio", data=weights.to_html())
+
+
+@app.route('/customportfolio/get_optimal_customportfolio_black_litterman', methods=['GET'])
+def get_optimal_customportfolio_black_litterman():
+
+    SP500 = get_SP500()
+    market_portfolio_weights = get_market_portfolio_weights(SP500, 3)
+    list_assets = list(market_portfolio_weights['Symbol'])
+    return_data = get_asset_return_data(list_assets)['df_return']
+    market_weights = np.array(market_portfolio_weights['market portfolio weights'])
+    num_views = 2
+    P = np.zeros((num_views, len(list_assets)))
+    alpha = 2.5
+
+    num_views = 2
+    relevant_assets = [['AZO', 'GOOGL'], ['IBM']]
+    P_views_values = [[0, 0], [0]]
+    Q_views_values = [0, 0]
+    Views_Matrices = update_views(list_assets, num_views, relevant_assets, P_views_values, Q_views_values)
+    P = Views_Matrices[0]
+    Q = Views_Matrices[1]
+    weights,Return = Black_Litterman(return_data, alpha, P, Q, market_weights)
+    print weights
+    return render_template('customportfolio.html', name="Optimal Portfolio", data=weights.to_html())
+
+
 @app.route('/portfolio/save_data', methods=['POST'])
 def save_data():
     df_return = get_asset_return_data(["GOOG", "AAPL", "AMZN", "FB", "TSLA", "UWTI", "NFLX", "TVIX"], start_date='2010-01-01')['df_return']

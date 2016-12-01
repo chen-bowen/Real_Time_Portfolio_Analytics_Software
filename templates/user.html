@@ -1,10 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Project 1</title>
-</head>
-<body>
+{% extends "base.html" %}
+
+{% block content %}
 
 <form method="post" action="/user/post_user">
     <label>Username:</label>
@@ -24,7 +20,4 @@
     <input type="submit" value="Delete User"/>
 </form>
 
-
-
-</body>
-</html>
+{% endblock %}

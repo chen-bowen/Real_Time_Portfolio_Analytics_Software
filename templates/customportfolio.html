@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+        <form method="get" action="/portfolio/get_optimal_portfolio_black_litterman">
+            <h3>Run Custom Black Litterman Optimization</h3>
+
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" value="">
+                </label>
+            </div>
+
+            <button type="submit" class="btn btn-default">Optimize</button>
+            <br>
+            <label>Optimal Portfolio:</label>
+            {{ data|safe}}
+        </form>
+
+        <div id="donut"></div>
+
+
+        <form method="post" action="/portfolio/save_data">
+            <button type="submit" class="btn btn-default">Save Data</button>
+        </form>
+
+{% endblock %}

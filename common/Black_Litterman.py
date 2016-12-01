@@ -71,7 +71,7 @@ def Black_Litterman(return_data, alpha, P, Q, wmkt):
 
         Return = (combined_return.T * w - 0.5 * alpha * cvxpy.quad_form(w, combined_covariance)).value
         weights = pd.DataFrame(w.value, index=name_asset, columns=['Holding'])
-        return [weights,Return]
+        return [weights, Return]
 
 '''
     # Calculate the weights
