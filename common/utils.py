@@ -33,45 +33,44 @@ def get_return_data(asset_list,
             'df_return': df_return}
 
 def mvoptimization(df_return, risk_limit, wealth=1):
+    # expected return found by calculating the mean of each stock (sample mean)
     expected_return = df_return.mean()
+    # covariance found by caluculating the covariance across different samples
     covariance = df_return.cov()
-    num_asset = len(covariance)
+    num_assets = len(covariance)
     name_asset = covariance.columns
 
-    # Variables and Parameters
-    w = cvxpy.Variable(num_asset)
-    Ret = np.matrix(expected_return.values)
+    # Initialize the weight variable that we are trying to find
+    w = cvxpy.Variable(num_assets)
+    # Input the return we get from the sample mean
+    Return = np.matrix(expected_return.values)
+    # Q as the covariance matrix
     Q = np.matrix(covariance.values)
-
-    #
+    # Call the quadratic equation risk
     risk = cvxpy.quad_form(w, Q)
 
+    # List of constraints
     constraints = list()
-
     # Budget Constraint
     constraints.append(cvxpy.sum_entries(w) == 1)
-
-    # Risk Contraint
+    # Risk Constraint
     constraints.append(risk <= risk_limit)
-
-    # Long only Constraint
+    # Long only Constraint, could be turned off
     constraints.append(w >= 0)
-
     # Objective Function
-    obj_func = cvxpy.Maximize(Ret*w)
+    objective = cvxpy.Maximize(Return*w)
 
     # Setting up the problem
-    prob = cvxpy.Problem(obj_func, constraints)
-
-    prob.solve(solver='CVXOPT', verbose=True)  # This should work as well
+    prob = cvxpy.Problem(objective, constraints)
+    prob.solve(solver='CVXOPT', verbose=True)
 
     print("Risk of: {0}".format(np.sqrt(risk.value)))
-
     weights = pd.DataFrame(w.value, index=name_asset, columns=['Holding'])
 
-    return np.round(weights, decimals=2)
+    return np.round(weights, decimals=2) # Round to two significant digits
 
 def Black_Litterman(return_data, alpha, P, Q, wmkt):
+    # the tau scalar that is used to
     tau = 0.05
     #    std = return_data.std().as_matrix()
     sigma = return_data.cov().as_matrix()
@@ -98,16 +97,3 @@ if __name__ == "__main__":
     optimal_weights = mvoptimization(result['df_return'], 0.05)
     print optimal_weights
  #   result['df_return'].to_csv('URL')
-    wmkt = np.array([0.615, 0.0783, 0.1827, 0.124])
-
-    alpha = 2.5
-    P1 = np.array([0, -.295, 1.00, -.705])
-    P2 = np.array([0, 1.0, 0, -1.0])
-    P = np.array([P1, P2])
-
-    Q1 = 0.05
-    Q2 = 0.03
-    Q = np.array([Q1, Q2])
-
-    result = Black_Litterman(result['df_return'], alpha, P, Q, wmkt)
-    print result
