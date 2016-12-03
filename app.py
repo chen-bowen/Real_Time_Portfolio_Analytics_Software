@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask import request, redirect, url_for, render_template
-from common.Return_Data_Collector import get_asset_return_data, get_SP500, get_market_portfolio_weights
+from common.Return_Data_Collector import get_asset_return_data, get_SP500, get_market_portfolio_weights, get_market_portfolio_weights_customized
 from common.Black_Litterman import Black_Litterman,update_views
 import pandas as pd
 import numpy as np
@@ -93,12 +93,13 @@ def get_optimal_portfolio_black_litterman():
     return render_template('portfolio.html', name="Optimal Portfolio", data=weights.to_html())
 
 
-@app.route('/customportfolio/get_optimal_customportfolio_black_litterman', methods=['GET'])
+@app.route('/customportfolio/get_optimal_customportfolio_black_litterman', methods=['GET','POST'])
 def get_optimal_customportfolio_black_litterman():
+    list_assets = request.form.getlist("check")
 
     SP500 = get_SP500()
-    market_portfolio_weights = get_market_portfolio_weights(SP500, 3)
-    list_assets = list(market_portfolio_weights['Symbol'])
+    market_portfolio_weights = get_market_portfolio_weights_customized(SP500, list_assets)
+    '''list_assets = list(market_portfolio_weights['Symbol'])'''
     return_data = get_asset_return_data(list_assets)['df_return']
     market_weights = np.array(market_portfolio_weights['market portfolio weights'])
     num_views = 2
@@ -106,26 +107,52 @@ def get_optimal_customportfolio_black_litterman():
     alpha = 2.5
 
     num_views = 2
-    relevant_assets = [['AZO', 'GOOGL'], ['IBM']]
+    relevant_assets = [[list_assets[0], list_assets[1]], [list_assets[2]]]
     P_views_values = [[0, 0], [0]]
     Q_views_values = [0, 0]
     Views_Matrices = update_views(list_assets, num_views, relevant_assets, P_views_values, Q_views_values)
     P = Views_Matrices[0]
     Q = Views_Matrices[1]
     weights,Return = Black_Litterman(return_data, alpha, P, Q, market_weights)
+    weights.to_sql("Optimal Weight", db.get_engine(app), if_exists='replace')
     print weights
-    return render_template('customportfolio.html', name="Optimal Portfolio", data=weights.to_html())
+    return render_template('customportfolio.html', name="Custom Optimal Portfolio", data=weights.to_html())
 
 
-@app.route('/portfolio/save_data', methods=['POST'])
+@app.route('/portfolio/save_data', methods=['GET','POST'])
 def save_data():
-    df_return = get_asset_return_data(["GOOG", "AAPL", "AMZN", "FB", "TSLA", "UWTI", "NFLX", "TVIX"], start_date='2010-01-01')['df_return']
-    SP500 = get_SP500()
+    weights = pd.read_sql_table("Optimal Weight", db.get_engine(app))
+    weights = weights.transpose()
+    weights.columns =weights .iloc[0]
+    #weights.reindex(weights.index.drop('index'))
+    print weights
 
-    df_return.to_sql("returns", db.get_engine(app), if_exists='replace')
-    SP500.to_sql("SP500", db.get_engine(app), if_exists='replace')
+    weights[1:].to_sql("Weights", db.get_engine(app), index=False, if_exists='append')
+
     # return render_template("user.html", name=["GOOG", "AAPL"], data=df.head(10).to_html())
     return redirect(url_for('portfolio'))
+
+
+@app.route('/customportfolio/custom_save_data', methods=['GET','POST'])
+def custom_save_data():
+    weights = pd.read_sql_table("Optimal Weight", db.get_engine(app))
+    weights = weights.transpose()
+    weights.columns =weights .iloc[0]
+    #weights.reindex(weights.index.drop('index'))
+    print weights
+
+    weights[1:].to_sql("Weights", db.get_engine(app), index=False, if_exists='append')
+
+    # return render_template("user.html", name=["GOOG", "AAPL"], data=df.head(10).to_html())
+    return redirect(url_for('customportfolio'))
+
+
+@app.route('/compare')
+def compare():
+    weights = pd.read_sql_table("Weights", db.get_engine(app))
+    weightsmod = weights.to_html(classes = 'table table-striped table-bordered table-hover id="example')
+    print weightsmod
+    return render_template('compare.html', name='Compare', data=weightsmod)
 
 
 if __name__ == "__main__":

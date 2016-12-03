@@ -83,7 +83,8 @@ if __name__ == "__main__":
 
     SP500 = get_SP500()
     market_portfolio_weights = get_market_portfolio_weights(SP500,3)
-    list_assets = list(market_portfolio_weights['Symbol'])
+    '''list_assets = list(market_portfolio_weights['Symbol'])'''
+    list_assets = ['PCLN', 'MHK', 'AZO','SJM', 'COST', 'CLX', 'TSO', 'VLO', 'RIG', 'BLK', 'ICE', 'EQR', 'ISRG', 'BIIB', 'GILD', 'UAL', 'GWW', 'LMT', 'GOOGL', 'GOOG', 'IBM', 'SHW', 'LYB', 'EMN', 'LVLT', 'VZ', 'T', 'SRE', 'AEP', 'DTE']
     return_data = get_asset_return_data(list_assets)['df_return']
     market_weights = np.array(market_portfolio_weights['market portfolio weights'])
 #    expected_return = return_data.mean()
@@ -99,7 +100,7 @@ if __name__ == "__main__":
     Views_Matrices = update_views(list_assets, num_views, relevant_assets, P_views_values, Q_views_values)
     P = Views_Matrices[0]
     Q = Views_Matrices[1]
-    result =  Black_Litterman(return_data, alpha, P, Q, market_weights)
+    result = Black_Litterman(return_data, alpha, P, Q, market_weights)
     print result[0]
     print"Return of ",result[1]*100, "%"
 

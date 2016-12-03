@@ -1,14 +1,16 @@
 {% extends "base.html" %}
 
 {% block content %}
-        <form method="get" action="/portfolio/get_optimal_portfolio_black_litterman">
+        <form method="post" action="/customportfolio/get_optimal_customportfolio_black_litterman">
             <h3>Run Custom Black Litterman Optimization</h3>
 
+            {% for item in ['PCLN', 'MHK', 'AZO', 'SJM', 'COST', 'CLX', 'TSO', 'VLO', 'RIG', 'BLK', 'ICE', 'EQR', 'ISRG', 'BIIB', 'GILD', 'UAL', 'GWW', 'LMT', 'GOOGL', 'GOOG', 'IBM', 'SHW', 'LYB', 'EMN', 'LVLT', 'VZ', 'T', 'SRE', 'AEP', 'DTE'] %}
             <div class="checkbox">
                 <label>
-                    <input type="checkbox" value="">
+                    <input type="checkbox" name=check value={{ item|safe }}> {{ item }}
                 </label>
             </div>
+            {% endfor %}
 
             <button type="submit" class="btn btn-default">Optimize</button>
             <br>
@@ -19,7 +21,7 @@
         <div id="donut"></div>
 
 
-        <form method="post" action="/portfolio/save_data">
+        <form method="post" action="/customportfolio/custom_save_data">
             <button type="submit" class="btn btn-default">Save Data</button>
         </form>
 

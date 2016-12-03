@@ -2,7 +2,7 @@ import pandas as pd
 import datetime
 from pandas_datareader import data
 import datapackage
-from dateutil.relativedelta import relativedelta
+
 
 
 def get_asset_return_data(asset_list,
@@ -45,6 +45,27 @@ def get_SP500():
     return SP500
 
 
+def get_market_portfolio_weights_customized(SP500, chosen_assets):
+    # Find the market portfolio constituents and it weights from S&P 500
+
+
+    SP500 = SP500.drop(list(SP500[SP500['Market Cap'].isnull()].index.values))
+
+    Portfolio = []
+
+    for i in chosen_assets:
+        Selected_stock = SP500[SP500['Symbol'] == i]
+
+        Portfolio.append(Selected_stock)
+
+    Portfolio = pd.concat(Portfolio)
+    total_market_cap = Portfolio['Market Cap'].apply(float).sum()
+    Portfolio['market portfolio weights'] = Portfolio['Market Cap'].apply(float) / total_market_cap
+
+    portflio_weights = Portfolio[['Symbol', 'market portfolio weights']]
+
+    return portflio_weights
+
 def get_market_portfolio_weights(SP500, assets_per_sector):
     # Find the market portfolio constituents and it weights from S&P 500
 
@@ -73,10 +94,13 @@ def get_market_portfolio_weights(SP500, assets_per_sector):
 if __name__ == "__main__":
     SP500 = get_SP500()
     market_portflio_weights = get_market_portfolio_weights(SP500,4)
+    chosen_assets = ["GOOGL", "AAPL", "AMZN", "FB", "TSLA", "UWTI", "NFLX", "TVIX"]
+    custom_market_portflio_weights = get_market_portfolio_weights_customized(SP500, chosen_assets)
+    print custom_market_portflio_weights
     list_assets = list(market_portflio_weights['Symbol'])
 
     result = get_asset_return_data(list_assets)['df_return']
-    print result.head(2)
+
 
 
 
