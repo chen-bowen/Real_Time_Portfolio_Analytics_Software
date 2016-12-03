@@ -121,7 +121,7 @@ def get_optimal_customportfolio_black_litterman():
     P = np.zeros((num_views, len(list_assets)))
     alpha = 2.5
 
-    relevant_assets = [[list_assets[0], list_assets[1]], [list_assets[2]]]
+    relevant_assets = [[list_assets[0], list_assets[1]], [list_assets[2]]] 
     P_views_values = [[0, 0], [0]]
     Q_views_values = [0, 0]
     Views_Matrices = update_views(list_assets, relevant_assets, P_views_values, Q_views_values)
