@@ -1,10 +1,14 @@
-from flask import Flask
+from flask import Flask, make_response
 from flask_sqlalchemy import SQLAlchemy
 from flask import request, redirect, url_for, render_template
-from common.Return_Data_Collector import get_asset_return_data, get_SP500, get_market_portfolio_weights, get_market_portfolio_weights_customized
-from common.Black_Litterman import Black_Litterman,update_views
+from common.Return_Data_Collector import get_asset_return_data, get_SP500, get_market_portfolio_weights, get_market_portfolio_weights_customized, get_price_changes_data
+from common.Black_Litterman import Black_Litterman,update_views,combine_momentum_oscilator_views, get_RSI_assets,update_relevant_assets_RSI, find_stochastic_osciliator, update_relevant_assets_Stochastic
 import pandas as pd
 import numpy as np
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+import matplotlib.pyplot as plt
+import StringIO
+
 
 app = Flask(__name__)
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://username:password@hostname/database_name'
@@ -69,27 +73,38 @@ def delete_user():
     return redirect(url_for('user'))
 
 
-@app.route('/portfolio/get_optimal_portfolio_black_litterman', methods=['GET'])
+@app.route('/portfolio/get_optimal_portfolio_black_litterman', methods=['GET','POST'])
 def get_optimal_portfolio_black_litterman():
 
     SP500 = get_SP500()
     market_portfolio_weights = get_market_portfolio_weights(SP500, 3)
     list_assets = list(market_portfolio_weights['Symbol'])
     return_data = get_asset_return_data(list_assets)['df_return']
+    return_data.to_sql("returns", db.get_engine(app), if_exists='replace')
+    SP500.to_sql("SP500", db.get_engine(app), if_exists='replace')
     market_weights = np.array(market_portfolio_weights['market portfolio weights'])
-    num_views = 2
-    P = np.zeros((num_views, len(list_assets)))
+
+    Close_prices = get_price_changes_data(list_assets)
+    Close_prices_copy = Close_prices.copy(deep=True)
+    High_prices = get_price_changes_data(list_assets, price_type='High')
+    Low_prices = get_price_changes_data(list_assets, price_type='Low')
+    RSI = get_RSI_assets(Close_prices_copy)
+    STO = find_stochastic_osciliator(High_prices, Low_prices, Close_prices)
     alpha = 2.5
 
-    num_views = 2
-    relevant_assets = [['AZO', 'GOOGL'], ['IBM']]
-    P_views_values = [[0, 0], [0]]
-    Q_views_values = [0, 0]
-    Views_Matrices = update_views(list_assets, num_views, relevant_assets, P_views_values, Q_views_values)
+    RSI_views = update_relevant_assets_RSI(RSI)
+    STO_views = update_relevant_assets_Stochastic(STO)
+
+    relevant_assets = combine_momentum_oscilator_views(RSI_views, STO_views)[0]
+    P_views_values = combine_momentum_oscilator_views(RSI_views, STO_views)[1]
+    Q_views_values = combine_momentum_oscilator_views(RSI_views, STO_views)[2]
+
+    Views_Matrices = update_views(list_assets, relevant_assets, P_views_values, Q_views_values)
     P = Views_Matrices[0]
     Q = Views_Matrices[1]
     weights,Return = Black_Litterman(return_data, alpha, P, Q, market_weights)
-    print weights
+    weights.to_sql("Optimal Weight", db.get_engine(app), if_exists='replace')
+
     return render_template('portfolio.html', name="Optimal Portfolio", data=weights.to_html())
 
 
@@ -115,7 +130,9 @@ def get_optimal_customportfolio_black_litterman():
     Q = Views_Matrices[1]
     weights,Return = Black_Litterman(return_data, alpha, P, Q, market_weights)
     weights.to_sql("Optimal Weight", db.get_engine(app), if_exists='replace')
-    print weights
+
+    weights.to_json(orient='records')
+
     return render_template('customportfolio.html', name="Custom Optimal Portfolio", data=weights.to_html())
 
 
@@ -145,6 +162,29 @@ def custom_save_data():
 
     # return render_template("user.html", name=["GOOG", "AAPL"], data=df.head(10).to_html())
     return redirect(url_for('customportfolio'))
+
+@app.route('/chart')
+def chart(chartID = 'chart_ID', chart_type = 'bar', chart_height = 350):
+    return render_template('chart.html', name='chart')
+
+
+@app.route('/plot.png')
+def plot():
+    weights = pd.read_sql_table("Weights", db.get_engine(app))
+    weight = weights.tail(1)
+
+    labels = list(weight.columns.values)
+    values = weight.values.tolist()
+
+    fig = plt.figure()
+    plt.pie(values[0], labels=labels)
+
+    canvas = FigureCanvas(fig)
+    output = StringIO.StringIO()
+    canvas.print_png(output)
+    response = make_response(output.getvalue())
+    response.mimetype = 'image/png'
+    return response
 
 
 @app.route('/compare')
