@@ -104,13 +104,25 @@ def get_optimal_portfolio_black_litterman():
     Q = Views_Matrices[1]
     weights,Return = Black_Litterman(return_data, alpha, P, Q, market_weights)
     weights.to_sql("Optimal Weight", db.get_engine(app), if_exists='replace')
+    weightsport = weights.to_html(classes = 'table table-striped table-bordered table-hover id="portfolio')
 
-    return render_template('portfolio.html', name="Optimal Portfolio", data=weights.to_html())
+    return render_template('portfolio.html', name="Optimal Portfolio", data=weightsport)
 
 
 @app.route('/customportfolio/get_optimal_customportfolio_black_litterman', methods=['GET','POST'])
 def get_optimal_customportfolio_black_litterman():
     list_assets = request.form.getlist("check")
+    view1 = request.form.getlist("select1")
+    view2 = request.form.getlist("select2")
+
+    if view1[2]=="<":
+        view1[0] ,view1[2] = view1[2] ,view1[0]
+
+    if view2[2]=="<":
+        view2[0] ,view2[2] = view2[2] ,view2[0]
+
+    print view1
+    print view2
 
     SP500 = get_SP500()
     market_portfolio_weights = get_market_portfolio_weights_customized(SP500, list_assets)
@@ -121,18 +133,18 @@ def get_optimal_customportfolio_black_litterman():
     P = np.zeros((num_views, len(list_assets)))
     alpha = 2.5
 
-    relevant_assets = [[list_assets[0], list_assets[1]], [list_assets[2]]] 
-    P_views_values = [[0, 0], [0]]
-    Q_views_values = [0, 0]
+    relevant_assets = [[view1[0], view1[2]], [view2[0], view2[2]]] #list asset, first two are only needed for relative view
+    P_views_values = [[1, -1], [1, -1]]
+    Q_views_values = [view1[3], view2[3]]
     Views_Matrices = update_views(list_assets, relevant_assets, P_views_values, Q_views_values)
     P = Views_Matrices[0]
     Q = Views_Matrices[1]
     weights,Return = Black_Litterman(return_data, alpha, P, Q, market_weights)
     weights.to_sql("Optimal Weight", db.get_engine(app), if_exists='replace')
 
-    weights.to_json(orient='records')
+    weightscust = weights.to_html(classes = 'table table-striped table-bordered table-hover id="portfolio')
 
-    return render_template('customportfolio.html', name="Custom Optimal Portfolio", data=weights.to_html())
+    return render_template('customportfolio.html', name="Custom Optimal Portfolio", data=weightscust)
 
 
 @app.route('/portfolio/save_data', methods=['GET','POST'])

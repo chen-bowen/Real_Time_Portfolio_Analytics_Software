@@ -12,13 +12,69 @@
             </div>
             {% endfor %}
 
+            <label>View 1</label>
+            <div>
+            <select multiple class="form-control" name="select1">
+                {% for item in ['PCLN', 'MHK', 'AZO', 'SJM', 'COST', 'CLX', 'TSO', 'VLO', 'RIG', 'BLK', 'ICE', 'EQR', 'ISRG', 'BIIB', 'GILD', 'UAL', 'GWW', 'LMT', 'GOOGL', 'GOOG', 'IBM', 'SHW', 'LYB', 'EMN', 'LVLT', 'VZ', 'T', 'SRE', 'AEP', 'DTE'] %}
+                    <option>{{ item|safe }}</option>
+                {% endfor %}
+            </select>
+
+            <select multiple class="form-control" name="select1">
+                {% for item in ['>', '<']%}
+                    <option>{{ item|safe }}</option>
+                {% endfor %}
+            </select>
+
+            <select multiple class="form-control" name="select1">
+                {% for item in ['PCLN', 'MHK', 'AZO', 'SJM', 'COST', 'CLX', 'TSO', 'VLO', 'RIG', 'BLK', 'ICE', 'EQR', 'ISRG', 'BIIB', 'GILD', 'UAL', 'GWW', 'LMT', 'GOOGL', 'GOOG', 'IBM', 'SHW', 'LYB', 'EMN', 'LVLT', 'VZ', 'T', 'SRE', 'AEP', 'DTE'] %}
+                <option>{{ item|safe }}</option>
+                {% endfor %}
+            </select>
+
+            <select multiple class="form-control" name="select1">
+                {% for item in ['>', '<']%}
+                    <option>{{ item|safe }}</option>
+                {% endfor %}
+            </select>
+            <input class="form-control" placeholder="Enter a percentage" name="select1">
+            </div>
+
+             <label>View 2</label>
+            <div>
+            <select multiple class="form-control" name="select2">
+                {% for item in ['PCLN', 'MHK', 'AZO', 'SJM', 'COST', 'CLX', 'TSO', 'VLO', 'RIG', 'BLK', 'ICE', 'EQR', 'ISRG', 'BIIB', 'GILD', 'UAL', 'GWW', 'LMT', 'GOOGL', 'GOOG', 'IBM', 'SHW', 'LYB', 'EMN', 'LVLT', 'VZ', 'T', 'SRE', 'AEP', 'DTE'] %}
+                    <option>{{ item|safe }}</option>
+                {% endfor %}
+            </select>
+
+            <select multiple class="form-control" name="select2">
+                {% for item in ['>', '<']%}
+                    <option>{{ item|safe }}</option>
+                {% endfor %}
+            </select>
+
+            <select multiple class="form-control" name="select2">
+                {% for item in ['PCLN', 'MHK', 'AZO', 'SJM', 'COST', 'CLX', 'TSO', 'VLO', 'RIG', 'BLK', 'ICE', 'EQR', 'ISRG', 'BIIB', 'GILD', 'UAL', 'GWW', 'LMT', 'GOOGL', 'GOOG', 'IBM', 'SHW', 'LYB', 'EMN', 'LVLT', 'VZ', 'T', 'SRE', 'AEP', 'DTE'] %}
+                <option>{{ item|safe }}</option>
+                {% endfor %}
+            </select>
+
+            <select multiple class="form-control" name="select2">
+                {% for item in ['>', '<']%}
+                    <option>{{ item|safe }}</option>
+                {% endfor %}
+            </select>
+            <input class="form-control" placeholder="Enter a percentage" name="select2">
+            </div>
+
             <button type="submit" class="btn btn-default">Optimize</button>
             <br>
             <label>Optimal Portfolio:</label>
+            <div class="table-responsive">
             {{ data|safe}}
+            </div>
         </form>
-
-        <div id="donut"></div>
 
 
         <form method="post" action="/customportfolio/custom_save_data">

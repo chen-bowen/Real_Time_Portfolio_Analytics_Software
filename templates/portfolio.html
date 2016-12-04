@@ -8,7 +8,9 @@
             <button type="submit" class="btn btn-default">Optimize</button>
             <br>
             <label>Optimal Portfolio:</label>
+            <div class="table-responsive">
             {{ data|safe }}
+            </div>
         </form>
 
         <form method="post" action="/portfolio/save_data">
