@@ -49,7 +49,8 @@ def update_relevant_assets_RSI(RSI):
         P_views_values.append(0)
         Q_views_values.append(0)
 
-    return [relevant_assets, P_views_values, Q_views_values]
+    return [relevant_assets, P_views_values, Q_views_values, [largest_rsi_stock, largest_rsi], [smallest_rsi_stock, smallest_rsi]]
+
 
 def update_relevant_assets_Stochastic(STO):
     largest_STO_stock = STO[-1:].idxmax(axis=1)[0]
@@ -72,7 +73,7 @@ def update_relevant_assets_Stochastic(STO):
         P_views_values.append(0)
         Q_views_values.append(0)
 
-    return [relevant_assets, P_views_values, Q_views_values]
+    return [relevant_assets, P_views_values, Q_views_values, [largest_STO_stock, largest_STO], [smallest_STO_stock, smallest_STO]]
 
 def combine_momentum_oscilator_views(RSI_views, STO_views):
     relevant_assets = [RSI_views[0],STO_views[0]]

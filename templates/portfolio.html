@@ -2,21 +2,9 @@
 
 {% block content %}
         <form method="get" action="/portfolio/get_optimal_portfolio_black_litterman">
-            <h3>Run Black Litterman Optimization</h3>
             <!--<label>Text Input</label>
             <input id="risk_limit" class="form-control" name="risk_limit" type="text"/> -->
             <button type="submit" class="btn btn-default">Optimize</button>
             <br>
-            <label>Optimal Portfolio:</label>
-            <div class="table-responsive">
-            {{ data|safe }}
-            </div>
         </form>
-
-        <form method="post" action="/portfolio/save_data">
-            <button type="submit" class="btn btn-default">Save Data</button>
-        </form>
-
-        <img src="../plot.png">
-
 {% endblock %}

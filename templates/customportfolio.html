@@ -2,12 +2,10 @@
 
 {% block content %}
         <form method="post" action="/customportfolio/get_optimal_customportfolio_black_litterman">
-            <h3>Run Custom Black Litterman Optimization</h3>
 
             <div>
                 <input class="form-control" placeholder="GOOGL, AAPL, MSFT" name="assets">
             </div>
-
 
             <label>View 1</label>
             <div>
@@ -21,16 +19,6 @@
 
             <button type="submit" class="btn btn-default">Optimize</button>
             <br>
-            <label>Optimal Portfolio:</label>
-            <div class="table-responsive">
-            {{ data|safe}}
-            </div>
-        </form>
-
-        <img src="../plot.png">
-
-        <form method="post" action="/customportfolio/custom_save_data">
-            <button type="submit" class="btn btn-default">Save Data</button>
         </form>
 
 {% endblock %}

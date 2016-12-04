@@ -1,4 +1,4 @@
-from flask import Flask, make_response
+from flask import Flask, make_response, session
 from flask_sqlalchemy import SQLAlchemy
 from flask import request, redirect, url_for, render_template
 from common.Return_Data_Collector import get_asset_return_data, get_SP500, get_market_portfolio_weights, get_market_portfolio_weights_customized, get_price_changes_data
@@ -14,6 +14,8 @@ app = Flask(__name__)
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://username:password@hostname/database_name'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://zbkogjiodhmxob:3LpsDLCEaBHv1b_cu99otyPdY6@ec2-54-235-119-29.compute-1.amazonaws.com:5432/ddv0hgedai3tgo'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+
+app.secret_key = 'many random bytes'
 
 # app.debug = True
 db = SQLAlchemy(app)
@@ -50,11 +52,11 @@ def user():
 
 @app.route('/portfolio')
 def portfolio():
-    return render_template('portfolio.html')
+    return render_template('portfolio.html', name='Run Portfolio Optimization')
 
 @app.route('/customportfolio')
 def customportfolio():
-    return render_template('customportfolio.html')
+    return render_template('customportfolio.html', name='Run Customized Portfolio Optimization')
 
 @app.route('/user/post_user', methods=['POST'])
 def post_user():
@@ -95,6 +97,15 @@ def get_optimal_portfolio_black_litterman():
     RSI_views = update_relevant_assets_RSI(RSI)
     STO_views = update_relevant_assets_Stochastic(STO)
 
+    RSI_small = RSI_views[3]
+    RSI_big = RSI_views[4]
+
+    print RSI_small
+    print RSI_big
+
+    RSI_views = RSI_views[:3]
+    STO_views = STO_views[:3]
+
     relevant_assets = combine_momentum_oscilator_views(RSI_views, STO_views)[0]
     P_views_values = combine_momentum_oscilator_views(RSI_views, STO_views)[1]
     Q_views_values = combine_momentum_oscilator_views(RSI_views, STO_views)[2]
@@ -106,7 +117,14 @@ def get_optimal_portfolio_black_litterman():
     weights.to_sql("Optimal Weight", db.get_engine(app), if_exists='replace')
     weightsport = weights.to_html(classes = 'table table-striped table-bordered table-hover id="portfolio')
 
-    return render_template('portfolio.html', name="Optimal Portfolio", data=weightsport)
+    session['data'] = weightsport
+    session['Return'] = Return
+    session['rsi_small'] = RSI_small
+    session['rsi_big'] = RSI_big
+
+    return redirect('/result')
+
+    '''return render_template('portfolio.html', name="Optimal Portfolio", data=weightsport)'''
 
 
 @app.route('/customportfolio/get_optimal_customportfolio_black_litterman', methods=['GET','POST'])
@@ -156,35 +174,11 @@ def get_optimal_customportfolio_black_litterman():
 
     weightscust = weights.to_html(classes = 'table table-striped table-bordered table-hover id="portfolio')
 
-    return render_template('customportfolio.html', name="Custom Optimal Portfolio", data=weightscust)
+    session['data'] = weightscust
 
+    return redirect('/customresult')
+    '''return render_template('customportfolio.html', name="Custom Optimal Portfolio", data=weightscust)'''
 
-@app.route('/portfolio/save_data', methods=['GET','POST'])
-def save_data():
-    weights = pd.read_sql_table("Optimal Weight", db.get_engine(app))
-    weights = weights.transpose()
-    weights.columns =weights .iloc[0]
-    #weights.reindex(weights.index.drop('index'))
-    print weights
-
-    weights[1:].to_sql("Weights", db.get_engine(app), index=False, if_exists='append')
-
-    # return render_template("user.html", name=["GOOG", "AAPL"], data=df.head(10).to_html())
-    return redirect(url_for('portfolio'))
-
-
-@app.route('/customportfolio/custom_save_data', methods=['GET','POST'])
-def custom_save_data():
-    weights = pd.read_sql_table("Optimal Weight", db.get_engine(app))
-    weights = weights.transpose()
-    weights.columns =weights .iloc[0]
-    #weights.reindex(weights.index.drop('index'))
-    print weights
-
-    weights[1:].to_sql("Weights", db.get_engine(app), index=False, if_exists='append')
-
-    # return render_template("user.html", name=["GOOG", "AAPL"], data=df.head(10).to_html())
-    return redirect(url_for('customportfolio'))
 
 @app.route('/chart')
 def chart(chartID = 'chart_ID', chart_type = 'bar', chart_height = 350):
@@ -218,6 +212,39 @@ def compare():
     weightsmod = weights.to_html(classes = 'table table-striped table-bordered table-hover id="example')
     print weightsmod
     return render_template('compare.html', name='Compare', data=weightsmod)
+
+
+@app.route('/result')
+def result():
+    data = session.get('data', None)
+    Return = session.get('Return', None)
+    RSI_small = session.get('rsi_small', None)
+    RSI_big = session.get('rsi_big', None)
+    print data
+    return render_template('result.html', name='Result', data=data, upstock=RSI_small[0], upRSI=RSI_small[1], downstock=RSI_big[0], downRSI=RSI_big[1], Return=Return)
+
+@app.route('/customresult')
+def customresult():
+    data = session.get('data', None)
+    Return = session.get('Return', None)
+    print data
+    return render_template('customresult.html', name='Result', data=data, Return=Return)
+
+
+@app.route('/result/save_data', methods=['GET','POST'])
+def save_data():
+    data = session.get('data', None)
+
+    weights = pd.read_sql_table("Optimal Weight", db.get_engine(app))
+    weights = weights.transpose()
+    weights.columns = weights.iloc[0]
+    # weights.reindex(weights.index.drop('index'))
+    print weights
+
+    weights[1:].to_sql("Weights", db.get_engine(app), index=False, if_exists='append')
+
+    # return render_template("user.html", name=["GOOG", "AAPL"], data=df.head(10).to_html())
+    return render_template('result.html', name='Result', data=data)
 
 
 if __name__ == "__main__":
