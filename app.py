@@ -111,15 +111,26 @@ def get_optimal_portfolio_black_litterman():
 
 @app.route('/customportfolio/get_optimal_customportfolio_black_litterman', methods=['GET','POST'])
 def get_optimal_customportfolio_black_litterman():
-    list_assets = request.form.getlist("check")
-    view1 = request.form.getlist("select1")
-    view2 = request.form.getlist("select2")
+    list_assets = request.form.getlist("assets")
+    list_assets = ''.join(list_assets)
+    list_assets = list_assets.replace(" ", "")
+    list_assets = list_assets.split(",")
+    print list_assets
 
-    if view1[2]=="<":
-        view1[0] ,view1[2] = view1[2] ,view1[0]
+    view1 = request.form.getlist("view1")
+    view2 = request.form.getlist("view2")
 
-    if view2[2]=="<":
-        view2[0] ,view2[2] = view2[2] ,view2[0]
+    view1 = ''.join(view1)
+    view1 = view1.replace("%", "")
+    view1 = view1.replace("by", "")
+    view1 = view1.split(" ")
+    if "" in view1: view1.remove("")
+
+    view2 = ''.join(view2)
+    view2 = view2.replace("%", "")
+    view2 = view2.replace("by", "")
+    view2 = view2.split(" ")
+    if "" in view2: view2.remove("")
 
     print view1
     print view2
@@ -135,7 +146,7 @@ def get_optimal_customportfolio_black_litterman():
 
     relevant_assets = [[view1[0], view1[2]], [view2[0], view2[2]]] #list asset, first two are only needed for relative view
     P_views_values = [[1, -1], [1, -1]]
-    Q_views_values = [int(view1[3]), int(view2[3])]
+    Q_views_values = [float(str(view1[3])), float(str(view2[3]))]
 
     Views_Matrices = update_views(list_assets, relevant_assets, P_views_values, Q_views_values)
     P = Views_Matrices[0]

@@ -4,58 +4,19 @@
         <form method="post" action="/customportfolio/get_optimal_customportfolio_black_litterman">
             <h3>Run Custom Black Litterman Optimization</h3>
 
-            {% for item in ['PCLN', 'MHK', 'AZO', 'SJM', 'COST', 'CLX', 'TSO', 'VLO', 'RIG', 'BLK', 'ICE', 'EQR', 'ISRG', 'BIIB', 'GILD', 'UAL', 'GWW', 'LMT', 'GOOGL', 'GOOG', 'IBM', 'SHW', 'LYB', 'EMN', 'LVLT', 'VZ', 'T', 'SRE', 'AEP', 'DTE'] %}
-            <div class="checkbox">
-                <label>
-                    <input type="checkbox" name=check value={{ item|safe }}> {{ item }}
-                </label>
+            <div>
+                <input class="form-control" placeholder="GOOGL, AAPL, MSFT" name="assets">
             </div>
-            {% endfor %}
+
 
             <label>View 1</label>
             <div>
-            <select multiple class="form-control" name="select1">
-                {% for item in ['PCLN', 'MHK', 'AZO', 'SJM', 'COST', 'CLX', 'TSO', 'VLO', 'RIG', 'BLK', 'ICE', 'EQR', 'ISRG', 'BIIB', 'GILD', 'UAL', 'GWW', 'LMT', 'GOOGL', 'GOOG', 'IBM', 'SHW', 'LYB', 'EMN', 'LVLT', 'VZ', 'T', 'SRE', 'AEP', 'DTE'] %}
-                    <option>{{ item|safe }}</option>
-                {% endfor %}
-            </select>
-
-            <select multiple class="form-control" name="select1">
-                {% for item in ['>', '<']%}
-                    <option>{{ item|safe }}</option>
-                {% endfor %}
-            </select>
-
-            <select multiple class="form-control" name="select1">
-                {% for item in ['PCLN', 'MHK', 'AZO', 'SJM', 'COST', 'CLX', 'TSO', 'VLO', 'RIG', 'BLK', 'ICE', 'EQR', 'ISRG', 'BIIB', 'GILD', 'UAL', 'GWW', 'LMT', 'GOOGL', 'GOOG', 'IBM', 'SHW', 'LYB', 'EMN', 'LVLT', 'VZ', 'T', 'SRE', 'AEP', 'DTE'] %}
-                <option>{{ item|safe }}</option>
-                {% endfor %}
-            </select>
-
-            <input class="form-control" placeholder="Enter a percentage" name="select1">
+            <input class="form-control" placeholder="GOOGL > MSFT by 2%" name="view1">
             </div>
 
-             <label>View 2</label>
+            <label>View 2</label>
             <div>
-            <select multiple class="form-control" name="select2">
-                {% for item in ['PCLN', 'MHK', 'AZO', 'SJM', 'COST', 'CLX', 'TSO', 'VLO', 'RIG', 'BLK', 'ICE', 'EQR', 'ISRG', 'BIIB', 'GILD', 'UAL', 'GWW', 'LMT', 'GOOGL', 'GOOG', 'IBM', 'SHW', 'LYB', 'EMN', 'LVLT', 'VZ', 'T', 'SRE', 'AEP', 'DTE'] %}
-                    <option>{{ item|safe }}</option>
-                {% endfor %}
-            </select>
-
-            <select multiple class="form-control" name="select2">
-                {% for item in ['>', '<']%}
-                    <option>{{ item|safe }}</option>
-                {% endfor %}
-            </select>
-
-            <select multiple class="form-control" name="select2">
-                {% for item in ['PCLN', 'MHK', 'AZO', 'SJM', 'COST', 'CLX', 'TSO', 'VLO', 'RIG', 'BLK', 'ICE', 'EQR', 'ISRG', 'BIIB', 'GILD', 'UAL', 'GWW', 'LMT', 'GOOGL', 'GOOG', 'IBM', 'SHW', 'LYB', 'EMN', 'LVLT', 'VZ', 'T', 'SRE', 'AEP', 'DTE'] %}
-                <option>{{ item|safe }}</option>
-                {% endfor %}
-            </select>
-
-            <input class="form-control" placeholder="Enter a percentage" name="select2">
+            <input class="form-control" placeholder="MSFT < AAPL by 3%" name="view2">
             </div>
 
             <button type="submit" class="btn btn-default">Optimize</button>
