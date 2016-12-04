@@ -135,7 +135,8 @@ def get_optimal_customportfolio_black_litterman():
 
     relevant_assets = [[view1[0], view1[2]], [view2[0], view2[2]]] #list asset, first two are only needed for relative view
     P_views_values = [[1, -1], [1, -1]]
-    Q_views_values = [view1[3], view2[3]]
+    Q_views_values = [int(view1[3]), int(view2[3])]
+
     Views_Matrices = update_views(list_assets, relevant_assets, P_views_values, Q_views_values)
     P = Views_Matrices[0]
     Q = Views_Matrices[1]
