@@ -32,11 +32,6 @@
                 {% endfor %}
             </select>
 
-            <select multiple class="form-control" name="select1">
-                {% for item in ['>', '<']%}
-                    <option>{{ item|safe }}</option>
-                {% endfor %}
-            </select>
             <input class="form-control" placeholder="Enter a percentage" name="select1">
             </div>
 
@@ -60,11 +55,6 @@
                 {% endfor %}
             </select>
 
-            <select multiple class="form-control" name="select2">
-                {% for item in ['>', '<']%}
-                    <option>{{ item|safe }}</option>
-                {% endfor %}
-            </select>
             <input class="form-control" placeholder="Enter a percentage" name="select2">
             </div>
 
@@ -76,6 +66,7 @@
             </div>
         </form>
 
+        <img src="../plot.png">
 
         <form method="post" action="/customportfolio/custom_save_data">
             <button type="submit" class="btn btn-default">Save Data</button>

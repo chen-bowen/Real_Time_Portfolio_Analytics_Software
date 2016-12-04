@@ -187,6 +187,8 @@ def plot():
     labels = list(weight.columns.values)
     values = weight.values.tolist()
 
+    plt.style.use('ggplot')
+
     fig = plt.figure()
     plt.pie(values[0], labels=labels)
 
