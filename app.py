@@ -133,7 +133,7 @@ def get_optimal_portfolio_black_litterman():
     weights = weights.append(Return_fr)
     weights.to_sql("Optimal Weight", db.get_engine(app), if_exists='replace')
 
-    #weights = weights[weights.Holding > 0.001]
+    weights = weights[weights.Holding > 0.00001]
     weights = weights.round(2)
 
     weightsport = weights[:-1].to_html(classes = 'table table-striped table-bordered table-hover id="portfolio')
@@ -210,7 +210,7 @@ def get_optimal_customportfolio_black_litterman():
 
     weights.to_sql("Optimal Weight", db.get_engine(app), if_exists='replace')
 
-    #weights = weights[weights.Holding > 0.01]
+    weights = weights[weights.Holding > 0.00001]
     weights = weights.round(2)
 
 
