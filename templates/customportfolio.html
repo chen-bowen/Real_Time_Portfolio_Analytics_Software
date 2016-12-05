@@ -1,24 +1,37 @@
 {% extends "base.html" %}
 
 {% block content %}
+
         <form method="post" action="/customportfolio/get_optimal_customportfolio_black_litterman">
-
-            <div>
-                <input class="form-control" placeholder="GOOGL, AAPL, MSFT" name="assets">
+            <div class="row">
+                <div class="col-xs-6">
+                    <label>Asset Tickers</label>
+                    <input class="form-control" placeholder="GOOGL, AAPL, MSFT" name="assets">
+                </div>
             </div>
 
-            <label>View 1</label>
-            <div>
-            <input class="form-control" placeholder="GOOGL > MSFT by 2%" name="view1">
+            </br>
+            <div class="row">
+                <div class="col-xs-6">
+                    <label>Relative View 1</label>
+                    <input class="form-control" placeholder="GOOGL > MSFT by 2%" name="view1">
+                </div>
             </div>
 
-            <label>View 2</label>
-            <div>
-            <input class="form-control" placeholder="MSFT < AAPL by 3%" name="view2">
+            </br>
+            <div class="row">
+                <div class="col-xs-6">
+                    <label>Relative View 2</label>
+                    <input class="form-control" placeholder="MSFT < AAPL by 3%" name="view2">
+                </div>
             </div>
 
-            <button type="submit" class="btn btn-default">Optimize</button>
-            <br>
+            </br>
+            <div class="row">
+                <div class="col-xs-6">
+                    <button type="submit" class="btn btn-default">Optimize</button>
+                </div>
+            </div>
         </form>
 
 {% endblock %}
