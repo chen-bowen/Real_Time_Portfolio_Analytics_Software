@@ -7,7 +7,7 @@ from dateutil.relativedelta import relativedelta
 def get_asset_return_data(asset_list,
                           price_type='Close',
                           source='yahoo',
-                          start_date='2016-01-01',
+                          start_date='2013-01-01',
                           end_date=datetime.datetime.today()):
     start_date = pd.to_datetime(start_date)
     end_date = pd.to_datetime(end_date)
@@ -68,6 +68,7 @@ def get_SP500():
                    'SEC Filings']]
     SP500 = SP500[SP500['Symbol'] <> 'NEE']
     SP500 = SP500[SP500['Symbol'] <> 'PSX']
+    SP500 = SP500[SP500['Symbol'] <> 'ICE']
 
     return SP500
 
