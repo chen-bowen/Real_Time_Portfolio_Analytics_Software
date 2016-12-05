@@ -7,6 +7,7 @@ import pandas as pd
 import numpy as np
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 import matplotlib.pyplot as plt
+import matplotlib.cm as cm
 import StringIO
 
 
@@ -99,6 +100,8 @@ def get_optimal_portfolio_black_litterman():
 
     RSI_small = RSI_views[3]
     RSI_big = RSI_views[4]
+    STO_small = STO_views[3]
+    STO_big = STO_views[4]
 
     print RSI_small
     print RSI_big
@@ -115,12 +118,18 @@ def get_optimal_portfolio_black_litterman():
     Q = Views_Matrices[1]
     weights,Return = Black_Litterman(return_data, alpha, P, Q, market_weights)
     weights.to_sql("Optimal Weight", db.get_engine(app), if_exists='replace')
+
+    weights = weights[weights.Holding > 0.01]
+    weights = weights.round(2)
+
     weightsport = weights.to_html(classes = 'table table-striped table-bordered table-hover id="portfolio')
 
     session['data'] = weightsport
     session['Return'] = Return
     session['rsi_small'] = RSI_small
     session['rsi_big'] = RSI_big
+    session['sto_small'] = STO_small
+    session['sto_big'] = STO_big
 
     return redirect('/result')
 
@@ -172,6 +181,9 @@ def get_optimal_customportfolio_black_litterman():
     weights,Return = Black_Litterman(return_data, alpha, P, Q, market_weights)
     weights.to_sql("Optimal Weight", db.get_engine(app), if_exists='replace')
 
+    weights = weights[weights.Holding > 0.01]
+    weights = weights.round(2)
+
     weightscust = weights.to_html(classes = 'table table-striped table-bordered table-hover id="portfolio')
 
     session['data'] = weightscust
@@ -189,14 +201,17 @@ def chart(chartID = 'chart_ID', chart_type = 'bar', chart_height = 350):
 def plot():
     weights = pd.read_sql_table("Weights", db.get_engine(app))
     weight = weights.tail(1)
+    weight = weight.loc[:, (weight > 0.01).any(axis=0)]
 
     labels = list(weight.columns.values)
     values = weight.values.tolist()
 
-    plt.style.use('ggplot')
+    cs = cm.Set1(np.arange(40) / 40.)
 
     fig = plt.figure()
-    plt.pie(values[0], labels=labels)
+    fig.patch.set_facecolor('white')
+    plt.pie(values[0], labels=labels, colors=cs)
+    plt.axis('equal')
 
     canvas = FigureCanvas(fig)
     output = StringIO.StringIO()
@@ -209,9 +224,11 @@ def plot():
 @app.route('/compare')
 def compare():
     weights = pd.read_sql_table("Weights", db.get_engine(app))
+    weights = weights.fillna(0)
+    weights = weights.round(2)
     weightsmod = weights.to_html(classes = 'table table-striped table-bordered table-hover id="example')
     print weightsmod
-    return render_template('compare.html', name='Compare', data=weightsmod)
+    return render_template('compare.html', name='Compare Saved Portfolio Weights', data=weightsmod)
 
 
 @app.route('/result')
@@ -220,8 +237,13 @@ def result():
     Return = session.get('Return', None)
     RSI_small = session.get('rsi_small', None)
     RSI_big = session.get('rsi_big', None)
+    STO_small = session.get('sto_small', None)
+    STO_big = session.get('sto_big', None)
     print data
-    return render_template('result.html', name='Result', data=data, upstock=RSI_small[0], upRSI=RSI_small[1], downstock=RSI_big[0], downRSI=RSI_big[1], Return=Return)
+    return render_template('result.html', name='Result', data=data, upRSIstock=RSI_small[0], upRSI=RSI_small[1],
+                           downRSIstock=RSI_big[0], downRSI=RSI_big[1], upSTOstock=STO_small[0], upSTO=STO_small[1],
+                           downSTOstock=STO_big[0], downSTO=STO_big[1], Return=Return)
+
 
 @app.route('/customresult')
 def customresult():
