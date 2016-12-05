@@ -9,14 +9,16 @@ from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import StringIO
+#from flask_security import Security, SQLAlchemyUserDatastore, UserMixin, RoleMixin, login_required
 
 
 app = Flask(__name__)
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://username:password@hostname/database_name'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://zbkogjiodhmxob:3LpsDLCEaBHv1b_cu99otyPdY6@ec2-54-235-119-29.compute-1.amazonaws.com:5432/ddv0hgedai3tgo'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+#app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 
 app.secret_key = 'many random bytes'
+#app.config['SECURITY_REGISTERABLE'] = True
 
 # app.debug = True
 db = SQLAlchemy(app)
@@ -24,63 +26,63 @@ db = SQLAlchemy(app)
 """
 Models
 """
+#roles_users = db.Table('roles_users',
+#        db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),
+#        db.Column('role_id', db.Integer(), db.ForeignKey('role.id')))
 
-class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), unique=True)
-    email = db.Column(db.String(255), unique=True)
 
-    def __init__(self, username, email):
-        self.username = username
-        self.email = email
+#class Role(db.Model, RoleMixin):
+#    id = db.Column(db.Integer(), primary_key=True)
+#    name = db.Column(db.String(80), unique=True)
+#    description = db.Column(db.String(255))
 
-    def __repr__(self):
-        return '<User %r>' % self.username
+
+#class User(db.Model, UserMixin):
+#    id = db.Column(db.Integer, primary_key=True)
+#    email = db.Column(db.String(255), unique=True)
+#    password = db.Column(db.String(255))
+#    active = db.Column(db.Boolean())
+#    confirmed_at = db.Column(db.DateTime())
+#    roles = db.relationship('Role', secondary=roles_users, backref=db.backref('users', lazy='dynamic'))
+
+
+# Setup Flask-Security
+#user_datastore = SQLAlchemyUserDatastore(db, User, Role)
+#security = Security(app, user_datastore)
+
 
 """
 Routes
 """
+
+
 @app.route('/')
 def index():
     return render_template('index.html')
 
 
-@app.route('/user')
-def user():
-    myUser = User.query.all()
-    return render_template('user.html', myUser=myUser)
+@app.route('/login')
+def login():
+    return render_template('login.html')
 
 
 @app.route('/portfolio')
 def portfolio():
     return render_template('portfolio.html', name='Run Portfolio Optimization')
 
+
 @app.route('/customportfolio')
 def customportfolio():
     return render_template('customportfolio.html', name='Run Customized Portfolio Optimization')
 
-@app.route('/user/post_user', methods=['POST'])
-def post_user():
-    user = User(request.form['username'], request.form['email'])
-    db.session.add(user)
-    db.session.commit()
-    return redirect(url_for('user'))
-
-
-@app.route('/user/delete_user', methods=['POST'])
-def delete_user():
-    user = User.query.filter_by(username=request.form['username']).first()
-    if user:
-        db.session.delete(user)
-        db.session.commit()
-    return redirect(url_for('user'))
-
 
 @app.route('/portfolio/get_optimal_portfolio_black_litterman', methods=['GET','POST'])
 def get_optimal_portfolio_black_litterman():
+    number_assets = request.args.get("number")
+    print number_assets
 
     SP500 = get_SP500()
-    market_portfolio_weights = get_market_portfolio_weights(SP500, 3)
+    market_portfolio_weights = get_market_portfolio_weights(SP500, int(number_assets))
     list_assets = list(market_portfolio_weights['Symbol'])
     return_data = get_asset_return_data(list_assets)['df_return']
     return_data.to_sql("returns", db.get_engine(app), if_exists='replace')
@@ -98,10 +100,13 @@ def get_optimal_portfolio_black_litterman():
     RSI_views = update_relevant_assets_RSI(RSI)
     STO_views = update_relevant_assets_Stochastic(STO)
 
-    RSI_small = RSI_views[3]
-    RSI_big = RSI_views[4]
-    STO_small = STO_views[3]
-    STO_big = STO_views[4]
+    print RSI_views
+    print STO_views
+
+    RSI_big = RSI_views[3]
+    RSI_small = RSI_views[4]
+    STO_big = STO_views[3]
+    STO_small = STO_views[4]
 
     print RSI_small
     print RSI_big
@@ -125,11 +130,18 @@ def get_optimal_portfolio_black_litterman():
     weightsport = weights.to_html(classes = 'table table-striped table-bordered table-hover id="portfolio')
 
     session['data'] = weightsport
-    session['Return'] = Return
+    session['Return'] = (Return*100).round(2)
     session['rsi_small'] = RSI_small
     session['rsi_big'] = RSI_big
     session['sto_small'] = STO_small
     session['sto_big'] = STO_big
+
+    #saving
+    weights = pd.read_sql_table("Optimal Weight", db.get_engine(app))
+    weights = weights.transpose()
+    weights.columns = weights.iloc[0]
+
+    weights[1:].to_sql("Weights", db.get_engine(app), index=False, if_exists='append')
 
     return redirect('/result')
 
@@ -187,13 +199,20 @@ def get_optimal_customportfolio_black_litterman():
     weightscust = weights.to_html(classes = 'table table-striped table-bordered table-hover id="portfolio')
 
     session['data'] = weightscust
+    session['Return'] = (Return*100).round(2)
+
+    weights = pd.read_sql_table("Optimal Weight", db.get_engine(app))
+    weights = weights.transpose()
+    weights.columns = weights.iloc[0]
+
+    weights[1:].to_sql("Weights", db.get_engine(app), index=False, if_exists='append')
 
     return redirect('/customresult')
     '''return render_template('customportfolio.html', name="Custom Optimal Portfolio", data=weightscust)'''
 
 
 @app.route('/chart')
-def chart(chartID = 'chart_ID', chart_type = 'bar', chart_height = 350):
+def chart():
     return render_template('chart.html', name='chart')
 
 
@@ -239,7 +258,7 @@ def result():
     RSI_big = session.get('rsi_big', None)
     STO_small = session.get('sto_small', None)
     STO_big = session.get('sto_big', None)
-    print data
+
     return render_template('result.html', name='Result', data=data, upRSIstock=RSI_small[0], upRSI=RSI_small[1],
                            downRSIstock=RSI_big[0], downRSI=RSI_big[1], upSTOstock=STO_small[0], upSTO=STO_small[1],
                            downSTOstock=STO_big[0], downSTO=STO_big[1], Return=Return)
@@ -260,8 +279,6 @@ def save_data():
     weights = pd.read_sql_table("Optimal Weight", db.get_engine(app))
     weights = weights.transpose()
     weights.columns = weights.iloc[0]
-    # weights.reindex(weights.index.drop('index'))
-    print weights
 
     weights[1:].to_sql("Weights", db.get_engine(app), index=False, if_exists='append')
 

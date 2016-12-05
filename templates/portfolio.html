@@ -2,13 +2,29 @@
 
 {% block content %}
     <div class="row">
-        <div class="col-xs-12">
+            <div class="col-xs-12">
+            <p>The Quick Create option was created with the goal of giving non-institutional users access to similar optimization models as professionals. Select the number of stocks from each sector of the S&P500 you would like to include in the optimization and our algorithm will determine the portfolio weights based on the assets' historical returns and trends.</p>
+            </div>
+        </div>
+    <div class="row">
+        <div class="col-md-8">
         <form method="get" action="/portfolio/get_optimal_portfolio_black_litterman">
             <!--<label>Text Input</label>
             <input id="risk_limit" class="form-control" name="risk_limit" type="text"/> -->
+            <div class="form-group">
+                                            <label>Number of Assets from Each Sector</label>
+                                            <select multiple class="form-control"  name="number">
+                                                <option>1</option>
+                                                <option>2</option>
+                                                <option>3</option>
+                                                <option>4</option>
+                                                <option>5</option>
+                                            </select>
+            </div>
             <button type="submit" class="btn btn-default">Optimize</button>
             <br>
         </form>
         </div>
-    </div>
+        </div>
+
 {% endblock %}

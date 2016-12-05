@@ -1,10 +1,14 @@
 {% extends "base.html" %}
 
 {% block content %}
-
+        <div class="row">
+            <div class="col-xs-12">
+            <p>Custom portfolios are designed for a professional user who desires a more flexible model. Enter both the assets to be included and related views.</p>
+            </div>
+        </div>
         <form method="post" action="/customportfolio/get_optimal_customportfolio_black_litterman">
             <div class="row">
-                <div class="col-xs-6">
+                <div class="col-md-8">
                     <label>Asset Tickers</label>
                     <input class="form-control" placeholder="GOOGL, AAPL, MSFT" name="assets">
                 </div>
@@ -12,7 +16,7 @@
 
             </br>
             <div class="row">
-                <div class="col-xs-6">
+                <div class="col-md-8">
                     <label>Relative View 1</label>
                     <input class="form-control" placeholder="GOOGL > MSFT by 2%" name="view1">
                 </div>
@@ -20,7 +24,7 @@
 
             </br>
             <div class="row">
-                <div class="col-xs-6">
+                <div class="col-md-8">
                     <label>Relative View 2</label>
                     <input class="form-control" placeholder="MSFT < AAPL by 3%" name="view2">
                 </div>
@@ -28,7 +32,7 @@
 
             </br>
             <div class="row">
-                <div class="col-xs-6">
+                <div class="col-md-8">
                     <button type="submit" class="btn btn-default">Optimize</button>
                 </div>
             </div>

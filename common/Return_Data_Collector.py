@@ -37,7 +37,7 @@ def get_asset_return_data(asset_list,
 def get_price_changes_data(asset_list,
                            price_type='Close',
                            source='yahoo',
-                           start_date=datetime.datetime.today() - relativedelta(months=1),
+                           start_date=datetime.datetime.today() - relativedelta(months=2),
                            end_date=datetime.datetime.today()):
     start_date = pd.to_datetime(start_date)
     end_date = pd.to_datetime(end_date)
