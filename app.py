@@ -249,7 +249,7 @@ def result():
 def customresult():
     data = session.get('data', None)
     Return = session.get('Return', None)
-    print data
+    print Return
     return render_template('customresult.html', name='Result', data=data, Return=Return)
 
 
