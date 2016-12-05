@@ -9,8 +9,8 @@ def find_relative_strength_index(stock):
     stock['gain'] = np.where(stock[stock.columns[0]]>0, stock[stock.columns[0]], 0)
     stock['loss'] = np.where(stock[stock.columns[0]]<0, stock[stock.columns[0]], 0)
     stock['loss'] = stock['loss'].apply(lambda x: abs(x))
-    stock['average gain'] = stock['gain'].rolling(window = 20,center = False).mean()
-    stock['average loss'] = stock['loss'].rolling(window = 20,center = False).mean()
+    stock['average gain'] = stock['gain'].rolling(window = 14,center = False).mean()
+    stock['average loss'] = stock['loss'].rolling(window = 14,center = False).mean()
     stock['RS'] = (stock['average gain']*1.0)/stock['average loss']
     stock['RSI'] = 100 - 100/(1+stock['RS'])
 

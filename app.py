@@ -9,47 +9,48 @@ from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import StringIO
-from flask_security import Security, SQLAlchemyUserDatastore, UserMixin, RoleMixin, login_required
+
+# from flask_security import Security, SQLAlchemyUserDatastore, UserMixin, RoleMixin, login_required
 
 
 app = Flask(__name__)
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://username:password@hostname/database_name'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://zbkogjiodhmxob:3LpsDLCEaBHv1b_cu99otyPdY6@ec2-54-235-119-29.compute-1.amazonaws.com:5432/ddv0hgedai3tgo'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+# app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 
 app.config['SECRET_KEY'] = 'super-secret'
-app.config['SECURITY_REGISTERABLE'] = True
+# app.config['SECURITY_REGISTERABLE'] = True
 
 app.debug = True
 db = SQLAlchemy(app)
 
-"""
-Models
-"""
-roles_users = db.Table('roles_users',
-       db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),
-       db.Column('role_id', db.Integer(), db.ForeignKey('role.id')))
-
-
-class Role(db.Model, RoleMixin):
-   id = db.Column(db.Integer(), primary_key=True)
-   name = db.Column(db.String(80), unique=True)
-   description = db.Column(db.String(255))
-
-
-class User(db.Model, UserMixin):
-   id = db.Column(db.Integer, primary_key=True)
-   email = db.Column(db.String(255), unique=True)
-   password = db.Column(db.String(255))
-   active = db.Column(db.Boolean())
-   confirmed_at = db.Column(db.DateTime())
-   roles = db.relationship('Role', secondary=roles_users, backref=db.backref('users', lazy='dynamic'))
-
-
-#Setup Flask-Security
-user_datastore = SQLAlchemyUserDatastore(db, User, Role)
-security = Security(app, user_datastore)
-
+# """
+# Models
+# """
+# roles_users = db.Table('roles_users',
+#        db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),
+#        db.Column('role_id', db.Integer(), db.ForeignKey('role.id')))
+#
+#
+# class Role(db.Model, RoleMixin):
+#    id = db.Column(db.Integer(), primary_key=True)
+#    name = db.Column(db.String(80), unique=True)
+#    description = db.Column(db.String(255))
+#
+#
+# class User(db.Model, UserMixin):
+#    id = db.Column(db.Integer, primary_key=True)
+#    email = db.Column(db.String(255), unique=True)
+#    password = db.Column(db.String(255))
+#    active = db.Column(db.Boolean())
+#    confirmed_at = db.Column(db.DateTime())
+#    roles = db.relationship('Role', secondary=roles_users, backref=db.backref('users', lazy='dynamic'))
+#
+#
+# #Setup Flask-Security
+# user_datastore = SQLAlchemyUserDatastore(db, User, Role)
+# security = Security(app, user_datastore)
+#
 
 """
 Routes
@@ -67,13 +68,13 @@ def login():
 
 
 @app.route('/portfolio')
-@login_required
+#@login_required
 def portfolio():
     return render_template('portfolio.html', name='Run Portfolio Optimization')
 
 
 @app.route('/customportfolio')
-@login_required
+#@login_required
 def customportfolio():
     return render_template('customportfolio.html', name='Run Customized Portfolio Optimization')
 
