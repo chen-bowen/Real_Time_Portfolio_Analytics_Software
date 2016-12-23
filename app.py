@@ -16,7 +16,7 @@ import StringIO
 app = Flask(__name__)
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://username:password@hostname/database_name'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://zbkogjiodhmxob:3LpsDLCEaBHv1b_cu99otyPdY6@ec2-54-235-119-29.compute-1.amazonaws.com:5432/ddv0hgedai3tgo'
-# app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 
 app.config['SECRET_KEY'] = 'super-secret'
 # app.config['SECURITY_REGISTERABLE'] = True
@@ -133,7 +133,7 @@ def get_optimal_portfolio_black_litterman():
     weights = weights.append(Return_fr)
     weights.to_sql("Optimal Weight", db.get_engine(app), if_exists='replace')
 
-    weights = weights[weights.Holding > 0.00001]
+    weights = weights[weights.Holding > 0.0001]
     weights = weights.round(2)
 
     weightsport = weights[:-1].to_html(classes = 'table table-striped table-bordered table-hover id="portfolio')
@@ -210,7 +210,7 @@ def get_optimal_customportfolio_black_litterman():
 
     weights.to_sql("Optimal Weight", db.get_engine(app), if_exists='replace')
 
-    weights = weights[weights.Holding > 0.00001]
+    weights = weights[weights.Holding > 0.0001]
     weights = weights.round(2)
 
 

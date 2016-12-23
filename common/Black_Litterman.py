@@ -5,18 +5,26 @@ import cvxpy
 import pandas as pd
 
 def find_relative_strength_index(stock):
+    # find the gains and losses in stocks
     stock = stock.diff()
+    # assemble the gains in one column
     stock['gain'] = np.where(stock[stock.columns[0]]>0, stock[stock.columns[0]], 0)
+    # assemble the losses in one column
     stock['loss'] = np.where(stock[stock.columns[0]]<0, stock[stock.columns[0]], 0)
+    # take the absolute value of losses
     stock['loss'] = stock['loss'].apply(lambda x: abs(x))
+    # find the 14 day moving average of gains and losses
     stock['average gain'] = stock['gain'].rolling(window = 14,center = False).mean()
     stock['average loss'] = stock['loss'].rolling(window = 14,center = False).mean()
+    # find the ration of RS by Average gain/Average loss
     stock['RS'] = (stock['average gain']*1.0)/stock['average loss']
+    # find RSI by 100 - 100/RS
     stock['RSI'] = 100 - 100/(1+stock['RS'])
 
     return stock['RSI']
 
 def get_RSI_assets(assets):
+    # Get the RSI values for each stock in list_assets
     for i in assets.columns:
         assets[i] = find_relative_strength_index(assets[i].to_frame())
     return assets
@@ -131,20 +139,15 @@ def Black_Litterman(return_data, alpha, P, Q, wmkt):
         # Find combined returns and combined covariance for the updated quadratic optimization
         combined_return = linalg.inv(scaled_sigma_inv + P.T.dot(Omega_inv).dot(P)).dot(np.dot(scaled_sigma_inv,pi).reshape(len(sigma), 1) + np.dot(np.dot(P.T,Omega_inv),Q))
         combined_covariance = sigma + linalg.inv(scaled_sigma_inv + P.T.dot(Omega_inv).dot(P))
-        #combined_cov_inv = linalg.inv(combined_covariance)
-
-        # For some reason this doesn't work
 
         num_asset = len(sigma)
         w = cvxpy.Variable(num_asset) #30 assets
 
         constraints = []
-        # constraints.append(cvxpy.abs(w) <= 0.4)
         constraints.append(w >= 0)
         constraints.append(cvxpy.sum_entries(w) == 1)
 
         objective = cvxpy.Maximize(combined_return.T * w - 0.5 * alpha * cvxpy.quad_form(w, combined_covariance))
-        # objective = cvxpy.Maximize(combined_return*w -0.5*alpha*(w.T*combined_covariance*w))
         problem = cvxpy.Problem(objective, constraints)
         problem.solve(solver='CVXOPT', verbose=True)
 

@@ -1,5 +1,4 @@
 
-
 import numpy as np
 from scipy import linalg
 from utils import get_return_data
