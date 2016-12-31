@@ -149,7 +149,7 @@ def Black_Litterman(return_data, alpha, P, Q, wmkt):
 
         objective = cvxpy.Maximize(combined_return.T * w - 0.5 * alpha * cvxpy.quad_form(w, combined_covariance))
         problem = cvxpy.Problem(objective, constraints)
-        problem.solve(solver='CVXOPT', verbose=True)
+        problem.solve(verbose=True)
 
         Return = (combined_return.T * w - 0.5 * alpha * cvxpy.quad_form(w, combined_covariance)).value
         pd.options.display.float_format = '{:.4f}%'.format
