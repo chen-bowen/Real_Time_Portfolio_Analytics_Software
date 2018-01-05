@@ -10,8 +10,8 @@ I would like to dedicate my sincere thanks to my professor Roy Kwon, for setting
 
 ## Technology
 
-This project is developed with python Flask framework that consists of three main components. Currently the project is not avaliable online. If you are really interested in seeing the project in action, please follow the 
-[installation instructions](installation instructions.pdf) file to recreate the envrionment.
+This project is developed with python Flask framework that consists of three main components. Currently the project is not avaliable online. If you are really interested in seeing the project in action, please follow the [installation instructions](docs/CONTRIBUTING.md)
+ file to recreate the envrionment.
 
 ### Backend
 
