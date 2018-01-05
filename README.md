@@ -22,7 +22,12 @@ highest EPS. The size of the portfolio will range from 10 to 50 bas
 
 ### Logical Component
 
-Based on the exisiting frameworks for portfolio optimization technique - Black Litterman Framework, this projects blends in two technical analysis indicators (relative strength index and stochastic oscilators) to make the algorithm more robust and versatile. The black-litterman model allows users input their personal views of the stock movements, allowing more customizations for the algorithm. However, not many investors are skilled enough to make reasonable view inputs. The technical analysis indicators could serve as internal metrics for the algorithm to self-input the views needed for Black-Litterman model. With the utilizations of this special model, we made sure our application could be used by both professional portfolio managers and speculative investors.
+Based on the exisiting frameworks for portfolio optimization technique - Black Litterman Framework, this projects blends in two technical analysis indicators (relative strength index and stochastic oscilators) to make the algorithm more robust and versatile. The black-litterman model allows users input their personal views of the stock movements, allowing more customizations for the algorithm (For details of the Black - Litterman model, please visit the capstone final report file in this repository). However, not many investors are skilled enough to make reasonable view inputs. The technical analysis indicators could serve as internal metrics for the algorithm to self-input the views needed for Black-Litterman model.The relative strength index and stochastic oscilators takes advantage of the stocks overbought and oversold situations and propose counter actions to gain profits.
+
+[![Capture.png](https://s18.postimg.org/he4bpeyw9/Capture.png)](https://postimg.org/image/mpj8a4kyt/)
+
+ With the utilizations of this special model, we made sure our application could be used by both professional portfolio managers and speculative investors
+
 
 
 
