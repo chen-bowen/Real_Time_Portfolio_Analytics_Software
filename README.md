@@ -9,3 +9,5 @@ The following project was completed between September 2016 to December 2017 as t
 I would like to dedicate my sincere thanks to my professor Roy Kwon, for setting up this great course for us to apply the technical skills we accquired during courses to solve a complex problem with real-life datasets. I also want to thank Professor Kwon's TA, Minho Lee, for his consistent support anytime we faced technical difficulties during our quest to complete this project. Finally, I really want to attribute to my fellow teammates, Yinger Li and Jessica Leung, for their great contributions to my first ever large scale analytics project. Without their presences, the completion of this project would not be possible. 
 
 ## Technology
+
+This project is built with a Flask framework
