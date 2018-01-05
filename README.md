@@ -2,7 +2,7 @@
 
 ## Abstract
 
-The following project was completed between September 2016 to December 2017 as the capstone course of my Engineering Science program at the University of Toronto. The goal of this project is to provide	a	decision	support	system to	recommend	optimally	weighted	equity	portfolios	targeted	towards investors with different skill levels. The project is delivered in the form of a Flask web application format. Unfortunately, I did not have time or capacity to find an approrpriate host to put the entire application on a online server. However, the logic component of the script is fully functional and could be used anytime. I would greatly appreciate if you could acknowledge us as the contributors in case if you would like to use any part of this project. Shall time allow me to do so, I would definetely try to upload the project to an online server for you to tryout. Thank you!
+The following project was completed during 2016 as the capstone course of my Engineering Science program at the University of Toronto. The goal of this project is to provide	a	decision	support	system to	recommend	optimally	weighted	equity	portfolios	targeted	towards investors with different skill levels. The project is delivered in the form of a Flask web application format. Unfortunately, I did not have time or capacity to find an approrpriate host to put the entire application on a online server. However, the logic component of the script is fully functional and could be used anytime. I would greatly appreciate if you could acknowledge us as the contributors in case if you would like to use any part of this project. Shall time allow me to do so, I would definetely try to upload the project to an online server for you to tryout. Thank you!
 
 ## Acknowledgements
 
