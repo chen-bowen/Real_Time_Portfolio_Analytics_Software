@@ -26,8 +26,17 @@ Based on the exisiting frameworks for portfolio optimization technique - Black L
 
 [![Capture.png](https://s18.postimg.org/he4bpeyw9/Capture.png)](https://postimg.org/image/mpj8a4kyt/)
 
- With the utilizations of this special model, we made sure our application could be used by both professional portfolio managers and speculative investors
+ With the utilizations of this special conjuction model, we made sure our application could be used by both professional portfolio managers and speculative investors. 
+
+### Frontend
+
+The frontend of this application is built with the bootstrap template "SmartAdmin - Responsive WebApp". We added plenty of modifications on the page to make it pretty. Below, is the front page once we logged in.
+
+[![landing_page.jpg](https://s18.postimg.org/9nxjjxh1l/landing_page.jpg)](https://postimg.org/image/uktrolf2d/)
+
+Here is the portfolio allocation presentation
+
+[![Capstone_Final_Report.jpg](https://s18.postimg.org/fc3ub38m1/Capstone_Final_Report.jpg)](https://postimg.org/image/g1mmng95h/)
 
 
-
-
+Thank you for visiting!
