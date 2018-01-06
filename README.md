@@ -16,7 +16,7 @@ This project is developed with python Flask framework that consists of three mai
 
 We use Flask as the backend framework since my team knows python and there are many libraries readily available. Daily financial data is downloaded using python pandas data reader from Yahoo Finance and stored in the PostgreSQL database, which is hosted on the Heroku server.  The stored data is then fed to the two completed models, which calculates results to be fed 
 to the frontend. The backend will download S&P 500 data and select top n assets (n = 1~5) from each sector based on 
-highest EPS. The size of the portfolio will range from 10 to 50 based on the choice of the assets. The specific implementation of the backend could be found in the [app.py](./app.py) file. The return data are downloaded using the *Return_Data_Collector.py* file in the commons folder. The backend flow chart is shown below.
+highest EPS. The size of the portfolio will range from 10 to 50 based on the choice of the assets. The specific implementation of the backend could be found in the [app.py](./app.py) file. The return data are downloaded using the ***Return_Data_Collector.py*** file in the commons folder. The backend flow chart is shown below.
                                               
 [![backend.jpg](https://s14.postimg.org/3wxzn1rht/backend.jpg)](https://postimg.org/image/3wxzn1rhp/)
 
@@ -26,7 +26,7 @@ Based on the exisiting frameworks for portfolio optimization technique - Black L
 
 [![Capture.png](https://s18.postimg.org/he4bpeyw9/Capture.png)](https://postimg.org/image/mpj8a4kyt/)
 
-With the utilizations of this special conjuction model, we made sure our application could be used by both professional portfolio managers and speculative investors. The specific implementation of the logic component of this app could be found in the *Black_Litterman.py* in the commons folder. 
+With the utilizations of this special conjuction model, we made sure our application could be used by both professional portfolio managers and speculative investors. The specific implementation of the logic component of this app could be found in the ***Black_Litterman.py*** in the commons folder. 
 
 ### Frontend
 
