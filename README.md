@@ -36,7 +36,7 @@ The frontend of this application is built with the bootstrap template "SmartAdmi
 ![landing_page.jpg](/Images/Landing%20Page.PNG)
 Here is the portfolio allocation presentation
 
-[Capstone_Final_Report](capstone presentation.pdf)
+[Capstone Final Presentation](capstone%20presentation.pdf)
 
 
 Thank you for visiting!
