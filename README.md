@@ -32,7 +32,7 @@ With the utilizations of this special conjuction model, we made sure our applica
 
 The frontend of this application is built with the bootstrap template "SmartAdmin - Responsive WebApp". We added plenty of modifications on the page to make it pretty. Below, is the front page once we logged in.
 
-[landing_page.jpg](/Images/Landing%20Page.PNG)
+![landing_page.jpg](/Images/Landing%20Page.PNG)
 Here is the portfolio allocation presentation
 
 ![Capstone_Final_Report.jpg](/Images/Interface.PNG )
